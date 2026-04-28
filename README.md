@@ -1,94 +1,92 @@
-# Polimicro - Evolusi Microcredential Masa Depan 🎓
+# Polimicro: Jembatan Menuju Karier Masa Depan 🚀
 
-**Polimicro** adalah platform pembelajaran *Microcredential* premium yang dirancang untuk menjawab tantangan industri modern. Dengan identitas **"Tech Scholar"**, kami menghadirkan pengalaman belajar yang cerdas, inklusif, dan berperforma tinggi bagi Mahasiswa, Dosen, serta Administrator.
+**Polimicro** bukan sekadar platform belajar biasa. Kami adalah ekosistem *Microcredential* yang dirancang untuk menghubungkan ambisi mahasiswa dengan kebutuhan nyata di dunia industri. Dengan sentuhan teknologi modern dan desain yang mengutamakan kenyamanan, Polimicro hadir untuk memastikan setiap langkah belajar Anda memiliki nilai nyata bagi masa depan.
 
-![Status](https://img.shields.io/badge/Status-Stabil-success?style=for-the-badge)
-![Laravel](https://img.shields.io/badge/Laravel-FF2D20?style=for-the-badge&logo=laravel&logoColor=white)
+![Status Proyek](https://img.shields.io/badge/Status-Siap_Digunakan-success?style=for-the-badge)
+![Laravel 11](https://img.shields.io/badge/Laravel-FF2D20?style=for-the-badge&logo=laravel&logoColor=white)
 ![TailwindCSS](https://img.shields.io/badge/Tailwind_CSS-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white)
 
 ---
 
-## ✨ Fitur Unggulan
+## 🌟 Mengapa Polimicro?
 
-### 👨‍🎓 Pengalaman Mahasiswa (Student-Centric)
-- **Roadmap Belajar Interaktif**: Visualisasi jalur pembelajaran yang terstruktur dan mudah dipahami.
-- **Sistem Gamifikasi**: Raih "Lencana Keahlian" setiap kali menyelesaikan program studi.
-- **Pelacakan Progres Real-time**: Pantau pencapaian akademik Anda dengan diagram progres yang intuitif.
-- **Navigasi Mobile-First**: Antarmuka navigasi bawah yang dioptimalkan untuk pengalaman layaknya aplikasi native di *smartphone*.
+Di era digital yang bergerak cepat, gelar saja terkadang tidak cukup. Polimicro hadir untuk memberikan solusi melalui kursus-kursus singkat yang intensif, relevan, dan tersertifikasi.
 
-### 👨‍🏫 Dasbor Dosen (Lecturer Empowerment)
-- **Evaluasi Efisien**: Kelola pengumpulan tugas dan berikan penilaian langsung dalam satu platform.
-- **Manajemen Materi Dinamis**: Unggah materi pembelajaran (PDF/ZIP) dengan mudah untuk setiap mata kuliah.
-- **Analitik Mahasiswa**: Pantau aktivitas dan perkembangan mahasiswa pengampu secara mendalam.
-
-### 🛡️ Kendali Administrator (Admin Mastery)
-- **Struktur Multi-Peran**: Dasbor khusus untuk PIC (Verifikasi) dan Admin Akademik (Master Data).
-- **Pusat Notifikasi**: Sistem pemberitahuan berbasis database untuk memastikan alur kerja tetap sinkron.
-- **Desain Glassmorphism**: Estetika visual premium dengan efek transparansi dan blur yang memukau.
+> *"Kami percaya bahwa setiap orang berhak memiliki akses ke keahlian tingkat lanjut tanpa harus terhambat oleh batasan ruang dan waktu."*
 
 ---
 
-## 🛠️ Teknologi & Arsitektur
-Polimicro dibangun dengan teknologi mutakhir untuk menjamin stabilitas dan skalabilitas:
+## ✨ Fitur yang Didesain untuk Anda
 
-- **Core Framework**: Laravel 11 (PHP 8.2+)
-- **Frontend Engine**: Tailwind CSS & Custom Design Tokens
-- **Database**: MySQL / MariaDB
-- **UI Components**: FontAwesome 6, Chart.js 4, SwiperJS 11
+### 🎓 Untuk Anda, Sang Pembelajar (Mahasiswa)
+Kami tahu bahwa belajar haruslah menyenangkan. Oleh karena itu, kami menghadirkan:
+- **Jalur Belajar Visual**: Lihat perjalanan akademik Anda dalam alur yang menarik, bukan sekadar daftar teks.
+- **Lencana Keahlian (Gamifikasi)**: Rayakan setiap keberhasilan Anda! Dapatkan lencana digital setiap kali Anda menguasai keahlian baru.
+- **Akses dalam Genggaman**: Antarmuka yang sangat ramah di ponsel, membuat Anda bisa belajar kapan saja, di mana saja.
+
+### 👨‍🏫 Untuk Anda, Sang Mentor (Dosen)
+Kami mempermudah tugas administratif Anda agar Anda bisa fokus menginspirasi:
+- **Evaluasi Tanpa Ribet**: Periksa tugas dan berikan masukan berharga hanya dengan beberapa klik.
+- **Berbagi Pengetahuan**: Unggah materi pembelajaran dengan cepat dan sampaikan ilmu Anda kepada ratusan mahasiswa sekaligus.
+
+### 🛡️ Untuk Anda, Sang Pengelola (Admin)
+Kendali penuh dengan visualisasi yang jernih:
+- **Verifikasi Cepat**: Sistem validasi pendaftaran yang rapi untuk memastikan setiap mahasiswa mendapatkan hak aksesnya.
+- **Keamanan Data**: Arsitektur yang kokoh untuk menjaga integritas data akademik dan sertifikasi.
 
 ---
 
-## 🎨 Identitas Visual (Tech Scholar)
-Kami menerapkan palet warna **Slate-800 & Cyan-600** yang memberikan kesan inovatif, dingin, dan otoritatif. Desain kami mengutamakan aksesibilitas dengan tombol aksi yang selalu terlihat (*always-visible buttons*) untuk memudahkan navigasi bagi semua kalangan pengguna.
+## 🎨 Filosofi Desain: Tech Scholar
+Platform ini menggunakan sistem desain **Tech Scholar** yang memadukan warna *Slate-800* (mewakili ketegasan akademik) dan *Cyan-600* (mewakili inovasi teknologi). Hasilnya? Sebuah antarmuka yang terasa premium, profesional, namun tetap hangat dan mudah digunakan.
 
 ---
 
-## 🚀 Panduan Instalasi
+## 📜 Perjalanan Kami (Log Pembaruan)
+Polimicro terus berevolusi untuk memberikan yang terbaik:
 
-Ciptakan lingkungan pengembangan Anda dalam hitungan menit:
+- **29 April 2026**: Transformasi total identitas visual ke *Tech Scholar*, optimasi penuh untuk perangkat mobile, dan peluncuran navigasi dinamis berbasis peran.
+- **29 April 2026**: Integrasi sistem paginasi global dan redesain katalog program dengan teknologi carousel modern.
+- **29 April 2026**: Penguatan sistem keamanan dan penyempurnaan fitur pengelolaan data bagi pengajar.
+- **28 April 2026**: Migrasi ke sistem *Database-Driven*, memungkinkan pelacakan progres dan lencana secara real-time.
+- **28 April 2026**: Peletakan batu pertama proyek—inisialisasi platform dengan UI premium dan sistem notifikasi cerdas.
 
-1. **Klon Repositori**
+---
+
+## 🚀 Memulai Perjalanan Anda
+
+Siap untuk menjalankan Polimicro di perangkat Anda? Ikuti langkah mudah ini:
+
+1. **Unduh Repositori**
    ```bash
    git clone https://github.com/PBL-214/polimicro.git
    cd polimicro
    ```
 
-2. **Instalasi Dependensi**
+2. **Siapkan Dependensi**
    ```bash
    composer install
    npm install && npm run build
    ```
 
-3. **Konfigurasi Lingkungan**
-   - Salin `.env.example` menjadi `.env`
-   - Atur kredensial database Anda
-   - Jalankan: `php artisan key:generate`
+3. **Konfigurasi Akhir**
+   - Buat file `.env` dari `.env.example`.
+   - Hubungkan ke database Anda.
+   - Jalankan `php artisan key:generate`.
 
-4. **Migrasi Database & Seeding**
+4. **Siapkan Database**
    ```bash
    php artisan migrate --seed
    ```
 
-5. **Jalankan Aplikasi**
+5. **Ayo Mulai!**
    ```bash
    php artisan serve
    ```
 
 ---
 
-## 📜 Log Pembaruan
-Pantau perkembangan terbaru dari proyek Polimicro:
+## 🤝 Mari Berkolaborasi
+Polimicro adalah proyek terbuka. Kami sangat senang jika Anda ingin ikut berkontribusi untuk membuat pendidikan microcredential di Indonesia menjadi lebih baik.
 
-- **2026-04-29**: Update README.md (Copywriting Bahasa Indonesia)
-- **2026-04-29**: Finalisasi sistem desain Tech Scholar, responsivitas mobile, dan navigasi dinamis.
-- **2026-04-29**: Implementasi paginasi global dan redesain halaman Program dengan Carousel.
-- **2026-04-29**: Peningkatan keamanan, perbaikan CRUD Dosen, dan optimasi UI/UX.
-- **2026-04-28**: Optimasi logika dashboard menjadi 100% database-driven (progres dinamis, lencana, dan grafik).
-- **2026-04-28**: Inisialisasi awal - Platform Polimicro dengan UI Premium & Sistem Notifikasi.
-
----
-
-## 🤝 Kontribusi
-Kami percaya bahwa kolaborasi adalah kunci inovasi. Jika Anda ingin berkontribusi, silakan lakukan *fork* pada repositori ini dan kirimkan *pull request*.
-
-Dikembangkan dengan dedikasi oleh **Tim PBL-214**. 🚀
+Salam hangat,  
+**Tim PBL-214** ❤️
