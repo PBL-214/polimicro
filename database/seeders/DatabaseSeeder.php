@@ -37,9 +37,9 @@ class DatabaseSeeder extends Seeder
         $mhs5 = $createUser(['name'=>'Rian Pratama','email'=>'rian@student.polimicro.ac.id','password'=>'mahasiswa123','nim'=>'2024005','status'=>'pending'], 'mahasiswa');
 
         // Dosen
-        $dsn1 = $createUser(['name'=>'Dr. Hendra Wijaya','email'=>'hendra@dosen.polimicro.ac.id','password'=>'dosen123','nip'=>'198501012020011001','bidang'=>'Artificial Intelligence','phone'=>'082111222333','status'=>'aktif'], 'dosen');
-        $dsn2 = $createUser(['name'=>'Prof. Ratna Sari','email'=>'ratna@dosen.polimicro.ac.id','password'=>'dosen123','nip'=>'197901012019012001','bidang'=>'Data Science','phone'=>'082111222334','status'=>'aktif'], 'dosen');
-        $dsn3 = $createUser(['name'=>'Dr. Bambang Eko','email'=>'bambang@dosen.polimicro.ac.id','password'=>'dosen123','nip'=>'198201012021011001','bidang'=>'Cybersecurity','phone'=>'082111222335','status'=>'aktif'], 'dosen');
+        $dsn1 = $createUser(['name'=>'Dr. Hendra Wijaya','email'=>'hendra@dosen.polimicro.ac.id','password'=>'dosen123','nip'=>'198501012020011001','homebase'=>'Artificial Intelligence','phone'=>'082111222333','status'=>'aktif'], 'dosen');
+        $dsn2 = $createUser(['name'=>'Prof. Ratna Sari','email'=>'ratna@dosen.polimicro.ac.id','password'=>'dosen123','nip'=>'197901012019012001','homebase'=>'Data Science & Analytics','phone'=>'082111222334','status'=>'aktif'], 'dosen');
+        $dsn3 = $createUser(['name'=>'Dr. Bambang Eko','email'=>'bambang@dosen.polimicro.ac.id','password'=>'dosen123','nip'=>'198201012021011001','homebase'=>'Cybersecurity','phone'=>'082111222335','status'=>'aktif'], 'dosen');
 
         // Admin
         $createUser(['name'=>'Admin PIC','email'=>'adminpic@polimicro.ac.id','password'=>'adminpic123','status'=>'aktif'], 'admin_pic');

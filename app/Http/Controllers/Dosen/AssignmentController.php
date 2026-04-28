@@ -73,6 +73,7 @@ class AssignmentController extends Controller
             'deskripsi_tugas' => 'required|string|max:5000',
             'tanggal_akhir_deadline' => 'required|date',
             'max_nilai' => 'required|integer|min:1|max:100',
+            'file_tugas' => 'nullable|file|max:2048',
         ]);
 
         // S1: Verify ownership
@@ -83,7 +84,23 @@ class AssignmentController extends Controller
             'Anda tidak berhak mengubah tugas ini.'
         );
 
-        $tugas->update($request->only('makul_id', 'nama_tugas', 'deskripsi_tugas', 'tanggal_akhir_deadline', 'max_nilai'));
+        $filePath = $tugas->file_tugas;
+        if ($request->hasFile('file_tugas')) {
+            // Delete old file if exists
+            if ($filePath && \Illuminate\Support\Facades\Storage::disk('public')->exists($filePath)) {
+                \Illuminate\Support\Facades\Storage::disk('public')->delete($filePath);
+            }
+            $filePath = $request->file('file_tugas')->store('assignments', 'public');
+        }
+
+        $tugas->update([
+            'makul_id' => $request->makul_id,
+            'nama_tugas' => $request->nama_tugas,
+            'deskripsi_tugas' => $request->deskripsi_tugas,
+            'tanggal_akhir_deadline' => $request->tanggal_akhir_deadline,
+            'max_nilai' => $request->max_nilai,
+            'file_tugas' => $filePath,
+        ]);
         return back()->with('success', 'Tugas berhasil diperbarui!');
     }
 

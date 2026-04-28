@@ -57,7 +57,7 @@
                     <div class="w-10 h-10 rounded-full gradient-primary flex items-center justify-center text-white text-xs font-bold shadow-md">{{ $d->getInitials() }}</div>
                     <div class="flex-1">
                         <p class="text-sm font-bold text-gray-900">{{ $d->name }}</p>
-                        <p class="text-[11px] text-gray-400 mt-0.5">{{ $d->bidang ?? 'Bidang Akademik' }}</p>
+                        <p class="text-[11px] text-gray-400 mt-0.5">{{ $d->homebase ?? 'Homebase' }}</p>
                     </div>
                     <span class="text-[10px] font-bold text-cyan-600 bg-cyan-50 px-2 py-1 rounded-lg">{{ $mc }} Matkul</span>
                 </div>

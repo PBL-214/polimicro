@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\AdminAkademik;
 
 use App\Http\Controllers\Controller;
+use App\Models\ProdiMikro;
 use App\Models\User;
 use Illuminate\Http\Request;
 
@@ -11,7 +12,8 @@ class LecturerController extends Controller
     public function index()
     {
         $dosenList = User::dosen()->get();
-        return view('admin-akademik.lecturers', compact('dosenList'));
+        $prodiList = ProdiMikro::aktif()->orderBy('nama_prodi')->get();
+        return view('admin-akademik.lecturers', compact('dosenList', 'prodiList'));
     }
 
     public function store(Request $request)
@@ -21,21 +23,20 @@ class LecturerController extends Controller
             'email' => 'required|email|unique:users,email',
             'nip' => 'nullable|string|max:30',
             'phone' => 'nullable|string|max:20',
-            'bidang' => 'nullable|string|max:100',
+            'homebase' => 'nullable|string|max:100|exists:prodi_mikro,nama_prodi',
             'address' => 'nullable|string|max:500',
         ]);
 
-        $user = new User([
-            'name' => $request->name,
-            'email' => $request->email,
-            'password' => 'dosen123',
-            'nip' => $request->nip,
-            'phone' => $request->phone,
-            'bidang' => $request->bidang,
-            'address' => $request->address,
-            'status' => 'aktif',
-        ]);
-        $user->role = 'dosen'; // Explicitly set — not mass-assignable
+        $user = new User();
+        $user->name = $request->name;
+        $user->email = $request->email;
+        $user->password = 'dosen123';
+        $user->nip = $request->nip;
+        $user->phone = $request->phone;
+        $user->homebase = $request->homebase;
+        $user->address = $request->address;
+        $user->status = 'aktif';
+        $user->role = 'dosen';
         $user->save();
 
         return back()->with('success', 'Dosen berhasil ditambahkan!');
@@ -50,11 +51,11 @@ class LecturerController extends Controller
             'email' => 'required|email|unique:users,email,' . $dosen->id,
             'nip' => 'nullable|string|max:30',
             'phone' => 'nullable|string|max:20',
-            'bidang' => 'nullable|string|max:100',
+            'homebase' => 'nullable|string|max:100|exists:prodi_mikro,nama_prodi',
             'address' => 'nullable|string|max:500',
         ]);
 
-        $dosen->update($request->only('name', 'email', 'nip', 'phone', 'bidang', 'address'));
+        $dosen->update($request->only('name', 'email', 'nip', 'phone', 'homebase', 'address'));
         return back()->with('success', 'Data dosen berhasil diperbarui!');
     }
 

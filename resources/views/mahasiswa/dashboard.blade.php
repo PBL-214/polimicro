@@ -104,7 +104,13 @@
                     </a>
                 </div>
             @empty
-                <div class="text-center py-12"><i class="fas fa-route text-4xl text-gray-200 mb-4 block"></i><p class="text-gray-400 text-sm">Belum ada mata kuliah yang diambil</p></div>
+                <x-empty-state 
+                    icon="fas fa-route" 
+                    title="Mulai Perjalanan Anda" 
+                    description="Anda belum mengambil mata kuliah apapun. Jelajahi katalog program kami."
+                    actionText="Jelajahi Program"
+                    :actionUrl="route('programs')"
+                />
             @endforelse
         </div>
     </div>
@@ -123,7 +129,12 @@
                     </div>
                 </div>
             @empty
-                <p class="text-gray-400 text-sm text-center py-4">Tidak ada tugas mendatang</p>
+                <x-empty-state 
+                    icon="fas fa-calendar-check" 
+                    title="Semua Beres!" 
+                    description="Tidak ada tugas mendatang untuk saat ini."
+                    class="py-10!"
+                />
             @endforelse
         </div>
     </div>

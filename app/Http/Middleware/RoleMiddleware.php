@@ -14,6 +14,10 @@ class RoleMiddleware
             return redirect()->route('login');
         }
 
+        if (auth()->user()->status !== 'aktif') {
+            return redirect()->route('pending-verification');
+        }
+
         if (!in_array(auth()->user()->role, $roles)) {
             return redirect()->route(auth()->user()->getDashboardRoute());
         }

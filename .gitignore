@@ -17,6 +17,8 @@
 /public/build
 /public/hot
 /public/storage
+/public/design-assets/img/
+/storage/framework/views/*
 /storage/*.key
 /storage/pail
 /vendor
@@ -24,3 +26,7 @@ _ide_helper.php
 Homestead.json
 Homestead.yaml
 Thumbs.db
+qa_testing_report*.md
+release_audit_report.md
+system_diagrams.md
+tests/Feature/PolimicroUserJourneyTest.php

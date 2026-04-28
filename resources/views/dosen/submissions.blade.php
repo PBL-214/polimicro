@@ -38,30 +38,41 @@
 @endforeach
 
 @push('modals')
-{{-- Grade Modal --}}
 <div id="grade-modal" class="fixed inset-0 z-50 hidden items-center justify-center" style="background:rgba(15,23,42,0.6); backdrop-filter: blur(4px);">
     <div class="bg-white rounded-3xl shadow-2xl p-8 max-w-md w-full mx-4 fade-in">
-        <h3 class="text-xl font-bold mb-4">Beri Nilai</h3>
-        <form id="grade-form" method="POST" class="space-y-4">@csrf @method('PUT')
-            <p class="text-sm text-slate-600 font-semibold" id="gf-info"></p>
-            <div><label class="block text-sm font-medium text-slate-600 mb-1">Nilai (0-100)</label><input type="number" name="nilai" id="gf-nilai" min="0" max="100" required class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-cyan-500 focus:border-cyan-500 transition"></div>
-            <div><label class="block text-sm font-medium text-slate-600 mb-1">Feedback</label><textarea name="feedback" id="gf-feedback" rows="3" class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-cyan-500 focus:border-cyan-500 transition"></textarea></div>
-            <div class="flex gap-3 mt-6">
-                <button type="button" onclick="document.getElementById('grade-modal').classList.add('hidden');document.getElementById('grade-modal').classList.remove('flex');" class="flex-1 py-3 rounded-xl border border-slate-200 text-slate-600 font-medium hover:bg-slate-50 transition">Batal</button>
-                <button type="submit" class="flex-1 py-3 bg-cyan-600 text-white hover:bg-cyan-700 rounded-xl font-semibold transition">Simpan Nilai</button>
+        <div class="flex items-center justify-between mb-6">
+            <h3 class="text-xl font-bold font-serif text-slate-800">Beri Nilai</h3>
+            <button type="button" onclick="closeGradeModal()" class="w-8 h-8 rounded-full bg-gray-100 hover:bg-gray-200 flex items-center justify-center text-gray-400 hover:text-gray-600 transition"><i class="fas fa-times text-sm"></i></button>
+        </div>
+        <form id="grade-form" method="POST" class="space-y-4" onsubmit="this.querySelector('[data-submit]').disabled=true;this.querySelector('[data-submit]').innerHTML='<i class=\'fas fa-spinner fa-spin text-sm\'></i> Menyimpan...'">@csrf @method('PUT')
+            <p class="text-sm text-slate-600 font-semibold bg-slate-50 px-4 py-3 rounded-xl" id="gf-info"></p>
+            <div><label class="block text-sm font-medium text-slate-600 mb-1">Nilai (0-100) <span class="text-red-400">*</span></label><input type="number" name="nilai" id="gf-nilai" min="0" max="100" required class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-cyan-500/20 focus:border-cyan-500 transition"></div>
+            <div><label class="block text-sm font-medium text-slate-600 mb-1">Feedback</label><textarea name="feedback" id="gf-feedback" rows="3" class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-cyan-500/20 focus:border-cyan-500 transition"></textarea></div>
+            <div class="flex gap-3 pt-2">
+                <button type="button" onclick="closeGradeModal()" class="flex-1 py-3 rounded-xl border border-slate-200 text-slate-600 font-medium hover:bg-slate-50 transition">Batal</button>
+                <button type="submit" data-submit class="flex-1 py-3 bg-cyan-600 text-white hover:bg-cyan-700 rounded-xl font-semibold transition flex items-center justify-center gap-2"><i class="fas fa-save text-sm"></i> Simpan Nilai</button>
             </div>
         </form>
     </div>
 </div>
 @endpush
+@push('scripts')
 <script>
 function openGrade(id, mhs, tugas, nilai, feedback) {
     document.getElementById('grade-form').action = '/dosen/submissions/' + id + '/grade';
-    document.getElementById('gf-info').textContent = mhs + ' - ' + tugas;
+    document.getElementById('gf-info').textContent = mhs + ' — ' + tugas;
     document.getElementById('gf-nilai').value = nilai || '';
     document.getElementById('gf-feedback').value = feedback || '';
+    const btn = document.querySelector('#grade-form [data-submit]');
+    btn.disabled = false;
+    btn.innerHTML = '<i class="fas fa-save text-sm"></i> Simpan Nilai';
     document.getElementById('grade-modal').classList.remove('hidden');
     document.getElementById('grade-modal').classList.add('flex');
 }
+function closeGradeModal() { document.getElementById('grade-modal').classList.add('hidden'); document.getElementById('grade-modal').classList.remove('flex'); }
+document.getElementById('grade-modal').addEventListener('click', function(e) { if (e.target === this) closeGradeModal(); });
+document.addEventListener('keydown', function(e) { if (e.key === 'Escape') closeGradeModal(); });
 </script>
+@endpush
 @endsection
+

@@ -11,6 +11,10 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400..700;1,400..700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     @stack('styles')
+    <style>
+        .empty-state-card { background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%); border: 2px dashed #e2e8f0; }
+        .empty-state-icon { background: white; box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05); }
+    </style>
 </head>
 <body class="bg-slate-50 text-slate-700">
     @php
@@ -123,7 +127,10 @@
                             <div class="p-4 border-b border-gray-100 flex items-center justify-between">
                                 <h4 class="font-bold text-sm">Notifikasi</h4>
                                 @if($unreadCount > 0)
-                                    <span class="text-[10px] text-cyan-600 font-semibold cursor-pointer">Tandai semua dibaca</span>
+                                    <form method="POST" action="{{ route('notifications.markAllRead') }}">
+                                        @csrf
+                                        <button type="submit" class="text-[10px] text-cyan-600 font-semibold hover:underline">Tandai semua dibaca</button>
+                                    </form>
                                 @endif
                             </div>
                             <div class="max-h-[350px] overflow-y-auto">

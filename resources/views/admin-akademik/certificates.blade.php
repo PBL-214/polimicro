@@ -3,7 +3,7 @@
 @section('content')
 <div class="flex items-center justify-between mb-6">
     <div><h1 class="text-2xl font-bold text-gray-900">Kelola Sertifikat</h1><p class="text-gray-500">Terbitkan dan kelola sertifikat kelulusan</p></div>
-    <button onclick="document.getElementById('cert-modal').classList.remove('hidden');document.getElementById('cert-modal').classList.add('flex');" class="px-5 py-3 btn-primary text-white rounded-xl font-semibold text-sm"><i class="fas fa-plus mr-2"></i>Terbitkan Sertifikat</button>
+    <button onclick="openCertModal()" class="px-5 py-3 btn-primary text-white rounded-xl font-semibold text-sm"><i class="fas fa-plus mr-2"></i>Terbitkan Sertifikat</button>
 </div>
 <div class="bg-white rounded-2xl border border-gray-100 overflow-hidden">
     <div class="overflow-x-auto"><table class="w-full text-sm">
@@ -33,27 +33,38 @@
 </div>
 
 @push('modals')
-{{-- Modal --}}
 <div id="cert-modal" class="fixed inset-0 z-50 hidden items-center justify-center" style="background:rgba(15,23,42,0.6); backdrop-filter: blur(4px);">
     <div class="bg-white rounded-3xl shadow-2xl p-8 max-w-lg w-full mx-4 fade-in">
-        <h3 class="text-xl font-bold mb-4 text-slate-800">Terbitkan Sertifikat Baru</h3>
-        <form method="POST" action="{{ route('admin-akademik.certificates.store') }}" enctype="multipart/form-data" class="space-y-4">@csrf
-            <div><label class="block text-sm font-medium text-slate-600 mb-1">Mahasiswa</label><select name="mahasiswa_id" required class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-cyan-500 focus:border-cyan-500">@foreach($mahasiswaList as $m)<option value="{{ $m->id }}">{{ $m->name }} ({{ $m->nim }})</option>@endforeach</select></div>
-            <div><label class="block text-sm font-medium text-slate-600 mb-1">Program Studi</label><select name="prodi_id" required class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-cyan-500 focus:border-cyan-500">@foreach($prodiList as $p)<option value="{{ $p->id }}">{{ $p->nama_prodi }}</option>@endforeach</select></div>
+        <div class="flex items-center justify-between mb-6">
+            <h3 class="text-xl font-bold font-serif text-slate-800">Terbitkan Sertifikat Baru</h3>
+            <button type="button" onclick="closeCertModal()" class="w-8 h-8 rounded-full bg-gray-100 hover:bg-gray-200 flex items-center justify-center text-gray-400 hover:text-gray-600 transition"><i class="fas fa-times text-sm"></i></button>
+        </div>
+        <form method="POST" action="{{ route('admin-akademik.certificates.store') }}" enctype="multipart/form-data" class="space-y-4" onsubmit="this.querySelector('[data-submit]').disabled=true;this.querySelector('[data-submit]').innerHTML='<i class=\'fas fa-spinner fa-spin text-sm\'></i> Menerbitkan...'">@csrf
+            <div><label class="block text-sm font-medium text-slate-600 mb-1">Mahasiswa <span class="text-red-400">*</span></label><select name="mahasiswa_id" required class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-cyan-500/20 focus:border-cyan-500 transition">@foreach($mahasiswaList as $m)<option value="{{ $m->id }}">{{ $m->name }} ({{ $m->nim }})</option>@endforeach</select></div>
+            <div><label class="block text-sm font-medium text-slate-600 mb-1">Program Studi <span class="text-red-400">*</span></label><select name="prodi_id" required class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-cyan-500/20 focus:border-cyan-500 transition">@foreach($prodiList as $p)<option value="{{ $p->id }}">{{ $p->nama_prodi }}</option>@endforeach</select></div>
             <div class="grid grid-cols-2 gap-4">
-                <div><label class="block text-sm font-medium text-slate-600 mb-1">Nomor Sertifikat</label><input type="text" name="nomor_sertifikat" value="CERT-PM-{{ date('Y') }}-{{ str_pad($certs->count()+1, 3, '0', STR_PAD_LEFT) }}" required class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-cyan-500"></div>
-                <div><label class="block text-sm font-medium text-slate-600 mb-1">Tanggal Terbit</label><input type="date" name="tanggal_terbit" value="{{ date('Y-m-d') }}" required class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-cyan-500"></div>
+                <div><label class="block text-sm font-medium text-slate-600 mb-1">Nomor Sertifikat <span class="text-red-400">*</span></label><input type="text" name="nomor_sertifikat" value="CERT-PM-{{ date('Y') }}-{{ str_pad($certs->count()+1, 3, '0', STR_PAD_LEFT) }}" required class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-cyan-500/20 focus:border-cyan-500 transition"></div>
+                <div><label class="block text-sm font-medium text-slate-600 mb-1">Tanggal Terbit <span class="text-red-400">*</span></label><input type="date" name="tanggal_terbit" value="{{ date('Y-m-d') }}" required class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-cyan-500/20 focus:border-cyan-500 transition"></div>
             </div>
             <div>
-                <label class="block text-sm font-medium text-slate-600 mb-1">File Sertifikat (PDF/JPG/PNG, Max: 2MB)</label>
+                <label class="block text-sm font-medium text-slate-600 mb-1">File Sertifikat (PDF/JPG/PNG, Max: 2MB) <span class="text-red-400">*</span></label>
                 <input type="file" name="file_sertifikat" required accept=".pdf,.jpg,.jpeg,.png" class="w-full px-4 py-3 rounded-xl border border-slate-200 text-sm file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-sm file:font-semibold file:bg-cyan-50 file:text-cyan-700 hover:file:bg-cyan-100">
             </div>
-            <div class="flex gap-3 mt-6">
-                <button type="button" onclick="document.getElementById('cert-modal').classList.add('hidden');document.getElementById('cert-modal').classList.remove('flex');" class="flex-1 py-3 rounded-xl border border-slate-200 text-slate-600 font-medium hover:bg-slate-50 transition">Batal</button>
-                <button type="submit" class="flex-1 py-3 bg-cyan-600 text-white hover:bg-cyan-700 rounded-xl font-semibold transition">Terbitkan</button>
+            <div class="flex gap-3 pt-2">
+                <button type="button" onclick="closeCertModal()" class="flex-1 py-3 rounded-xl border border-slate-200 text-slate-600 font-medium hover:bg-slate-50 transition">Batal</button>
+                <button type="submit" data-submit class="flex-1 py-3 bg-cyan-600 text-white hover:bg-cyan-700 rounded-xl font-semibold transition flex items-center justify-center gap-2"><i class="fas fa-certificate text-sm"></i> Terbitkan</button>
             </div>
         </form>
     </div>
 </div>
 @endpush
+@push('scripts')
+<script>
+function openCertModal() { document.getElementById('cert-modal').classList.remove('hidden'); document.getElementById('cert-modal').classList.add('flex'); }
+function closeCertModal() { document.getElementById('cert-modal').classList.add('hidden'); document.getElementById('cert-modal').classList.remove('flex'); }
+document.getElementById('cert-modal').addEventListener('click', function(e) { if (e.target === this) closeCertModal(); });
+document.addEventListener('keydown', function(e) { if (e.key === 'Escape') closeCertModal(); });
+</script>
+@endpush
 @endsection
+

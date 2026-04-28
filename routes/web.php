@@ -18,6 +18,7 @@ Route::middleware('guest')->group(function () {
 });
 
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout')->middleware('auth');
+Route::get('/pending-verification', fn() => view('auth.pending-verification'))->name('pending-verification')->middleware('auth');
 
 Route::get('/programs', [ProgramController::class, 'index'])->name('programs');
 Route::post('/programs/enroll', [ProgramController::class, 'enroll'])->name('programs.enroll')->middleware('auth');
@@ -87,3 +88,8 @@ Route::get('/notifications/{notification}/click', function($notification) {
     $notif->markAsRead();
     return redirect($notif->data['url'] ?? route(auth()->user()->getDashboardRoute()));
 })->middleware('auth')->name('notifications.click');
+
+Route::post('/notifications/mark-all-read', function() {
+    auth()->user()->unreadNotifications->markAsRead();
+    return back();
+})->middleware('auth')->name('notifications.markAllRead');

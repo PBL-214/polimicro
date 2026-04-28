@@ -28,7 +28,8 @@ class VerificationController extends Controller
         if ($request->status === 'diterima') {
             $user = User::find($pendaftaran->mahasiswa_id);
             if ($user && $user->status === 'pending') {
-                $user->update(['status' => 'aktif']);
+                $user->status = 'aktif';
+                $user->save();
             }
         }
 

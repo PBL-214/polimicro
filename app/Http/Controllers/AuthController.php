@@ -51,15 +51,14 @@ class AuthController extends Controller
         $lastNim = User::mahasiswa()->max('nim') ?? '2024000';
         $newNim = str_pad((int)$lastNim + 1, 7, '0', STR_PAD_LEFT);
 
-        $user = new User([
-            'name' => $request->nama,
-            'email' => $request->email,
-            'password' => $request->password,
-            'phone' => $request->phone,
-            'nim' => $newNim,
-            'status' => 'pending',
-        ]);
-        $user->role = 'mahasiswa'; // Explicitly set — not mass-assignable
+        $user = new User();
+        $user->name = $request->nama;
+        $user->email = $request->email;
+        $user->password = $request->password;
+        $user->phone = $request->phone;
+        $user->nim = $newNim;
+        $user->status = 'pending';
+        $user->role = 'mahasiswa';
         $user->save();
 
         \App\Models\Pendaftaran::create([

@@ -68,7 +68,7 @@ class MaterialController extends Controller
             'makul_id' => 'required|exists:makul,id',
             'nama_materi' => 'required|string|max:100',
             'deskripsi_materi' => 'required|string|max:5000',
-            'file_materi' => 'nullable|string|max:255',
+            'file_materi' => 'nullable|file|max:2048',
         ]);
 
         // S1: Verify ownership
@@ -79,7 +79,28 @@ class MaterialController extends Controller
             'Anda tidak berhak mengubah materi ini.'
         );
 
-        $materi->update($request->only('makul_id', 'nama_materi', 'deskripsi_materi', 'file_materi'));
+        $filePath = $materi->file_materi;
+        if ($request->hasFile('file_materi')) {
+            $allowed = ['pdf', 'doc', 'docx', 'zip', 'rar'];
+            $ext = strtolower($request->file('file_materi')->getClientOriginalExtension());
+            if (!in_array($ext, $allowed)) {
+                return back()->withErrors(['file_materi' => 'Format file tidak diizinkan.'])->withInput();
+            }
+            
+            // Delete old file if exists
+            if ($filePath && \Illuminate\Support\Facades\Storage::disk('public')->exists($filePath)) {
+                \Illuminate\Support\Facades\Storage::disk('public')->delete($filePath);
+            }
+            
+            $filePath = $request->file('file_materi')->store('materials', 'public');
+        }
+
+        $materi->update([
+            'makul_id' => $request->makul_id,
+            'nama_materi' => $request->nama_materi,
+            'deskripsi_materi' => $request->deskripsi_materi,
+            'file_materi' => $filePath,
+        ]);
         return back()->with('success', 'Materi berhasil diperbarui!');
     }
 
