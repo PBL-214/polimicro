@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kelola Mata Kuliah - Admin PIC - Polimicro</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="../assets/css/custom.css">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-50" style="background:#faf8f5">
+  <div id="app"></div>
+  <div id="mk-modal" class="fixed inset-0 z-50 hidden items-center justify-center modal-overlay">
+    <div class="bg-white rounded-3xl shadow-2xl p-8 max-w-lg w-full mx-4 fade-in">
+      <h3 class="text-xl font-bold mb-4" id="mkm-title">Tambah Mata Kuliah</h3>
+      <form id="mk-form" class="space-y-4">
+        <input type="hidden" id="mkf-id">
+        <div><label class="block text-sm font-medium text-gray-600 mb-1">Nama Mata Kuliah</label><input type="text" id="mkf-nama" required class="w-full px-4 py-3 rounded-xl border border-gray-200"></div>
+        <div class="grid grid-cols-2 gap-4">
+          <div><label class="block text-sm font-medium text-gray-600 mb-1">Program Studi</label><select id="mkf-prodi" required class="w-full px-4 py-3 rounded-xl border border-gray-200"></select></div>
+          <div><label class="block text-sm font-medium text-gray-600 mb-1">Dosen Pengampu</label><select id="mkf-dosen" required class="w-full px-4 py-3 rounded-xl border border-gray-200"></select></div>
+        </div>
+        <div><label class="block text-sm font-medium text-gray-600 mb-1">Deskripsi</label><textarea id="mkf-desc" rows="3" class="w-full px-4 py-3 rounded-xl border border-gray-200"></textarea></div>
+        <div><label class="block text-sm font-medium text-gray-600 mb-1">SKS</label><input type="number" id="mkf-sks" value="3" min="1" max="6" class="w-full px-4 py-3 rounded-xl border border-gray-200"></div>
+        <div class="flex gap-3">
+          <button type="button" onclick="closeModal()" class="flex-1 py-3 rounded-xl border border-gray-200 text-gray-600 font-medium">Batal</button>
+          <button type="submit" class="flex-1 py-3 btn-primary text-white rounded-xl font-semibold">Simpan</button>
+        </div>
+      </form>
+    </div>
+  </div>
+  <script src="../assets/js/data.js"></script><script src="../assets/js/auth.js"></script><script src="../assets/js/utils.js"></script><script src="../assets/js/sidebar.js"></script>
+  <script>
+    if (!Auth.requireAuth(['admin_pic'])) throw '';
+    const dosenList = PoliData.getDosenList();
+
+    document.getElementById('app').innerHTML = buildSidebar('admin_pic', 'courses') + `
+    <main class="p-6 lg:p-8 fade-in">
+      <div class="flex items-center justify-between mb-6">
+        <div><h1 class="text-2xl font-bold text-gray-900">Kelola Mata Kuliah</h1><p class="text-gray-500">Kelola mata kuliah per program studi</p></div>
+        <button onclick="openAdd()" class="px-5 py-3 btn-primary text-white rounded-xl font-semibold text-sm"><i class="fas fa-plus mr-2"></i>Tambah Matkul</button>
+      </div>
+      <select id="filter" class="px-4 py-3 rounded-xl border border-gray-200 bg-white text-sm mb-6" onchange="render()">
+        <option value="all">Semua Prodi</option>
+        ${PoliData.prodi.map(p => `<option value="${p.id}">${p.nama}</option>`).join('')}
+      </select>
+      <div id="mk-list"></div>
+    </main>` + closeSidebarLayout();
+
+    function render() {
+      const f = document.getElementById('filter').value;
+      const list = document.getElementById('mk-list');
+      let matkuls = f === 'all' ? PoliData.matkul : PoliData.matkul.filter(m => m.prodi_id == f);
+      list.innerHTML = `<div class="bg-white rounded-2xl border border-gray-100 overflow-hidden">
+        <div class="overflow-x-auto"><table class="w-full text-sm">
+          <thead><tr class="bg-gray-50" style="background:#faf8f5"><th class="px-5 py-3 text-left font-semibold text-gray-600">Mata Kuliah</th><th class="px-5 py-3 text-left font-semibold text-gray-600">Prodi</th><th class="px-5 py-3 text-left font-semibold text-gray-600">Dosen</th><th class="px-5 py-3 text-center font-semibold text-gray-600">SKS</th><th class="px-5 py-3 text-center font-semibold text-gray-600">Aksi</th></tr></thead>
+          <tbody class="divide-y divide-gray-50">
+            ${matkuls.map(m => {
+              const prodi = PoliData.getProdiById(m.prodi_id);
+              const dosen = PoliData.getUserById(m.dosen_id);
+              return `<tr class="hover:bg-gray-50">
+                <td class="px-5 py-4"><p class="font-medium">${m.nama}</p><p class="text-xs text-gray-400 mt-1 max-w-xs truncate">${m.deskripsi}</p></td>
+                <td class="px-5 py-4 text-gray-500">${prodi ? prodi.nama : '-'}</td>
+                <td class="px-5 py-4 text-gray-500 text-xs">${dosen ? dosen.nama : '-'}</td>
+                <td class="px-5 py-4 text-center">${m.sks}</td>
+                <td class="px-5 py-4 text-center"><div class="flex gap-2 justify-center">
+                  <button onclick="editMK(${m.id})" class="px-3 py-2 bg-blue-50 text-blue-600 rounded-lg text-xs hover:bg-blue-100"><i class="fas fa-edit"></i></button>
+                  <button onclick="deleteMK(${m.id})" class="px-3 py-2 bg-red-50 text-red-600 rounded-lg text-xs hover:bg-red-100"><i class="fas fa-trash"></i></button>
+                </div></td>
+              </tr>`;
+            }).join('')}
+            ${matkuls.length === 0 ? '<tr><td colspan="5" class="px-5 py-12 text-center text-gray-400">Tidak ada data</td></tr>' : ''}
+          </tbody>
+        </table></div>
+      </div>`;
+    }
+
+    function populateSelects(prodi_id, dosen_id) {
+      document.getElementById('mkf-prodi').innerHTML = PoliData.prodi.map(p => `<option value="${p.id}" ${p.id === prodi_id ? 'selected' : ''}>${p.nama}</option>`).join('');
+      document.getElementById('mkf-dosen').innerHTML = dosenList.map(d => `<option value="${d.id}" ${d.id === dosen_id ? 'selected' : ''}>${d.nama}</option>`).join('');
+    }
+    function openAdd() { document.getElementById('mkm-title').textContent = 'Tambah Mata Kuliah'; document.getElementById('mkf-id').value = ''; document.getElementById('mkf-nama').value = ''; document.getElementById('mkf-desc').value = ''; document.getElementById('mkf-sks').value = 3; populateSelects(null, null); showModal(); }
+    function editMK(id) { const m = PoliData.getMatkulById(id); if (!m) return; document.getElementById('mkm-title').textContent = 'Edit Mata Kuliah'; document.getElementById('mkf-id').value = m.id; document.getElementById('mkf-nama').value = m.nama; document.getElementById('mkf-desc').value = m.deskripsi; document.getElementById('mkf-sks').value = m.sks; populateSelects(m.prodi_id, m.dosen_id); showModal(); }
+    function showModal() { document.getElementById('mk-modal').classList.remove('hidden'); document.getElementById('mk-modal').classList.add('flex'); }
+    function closeModal() { document.getElementById('mk-modal').classList.add('hidden'); document.getElementById('mk-modal').classList.remove('flex'); }
+    function deleteMK(id) { if (!confirm('Hapus mata kuliah ini?')) return; PoliData.matkul = PoliData.matkul.filter(m => m.id !== id); saveData(); render(); Utils.showToast('Mata kuliah dihapus'); }
+
+    document.getElementById('mk-form').addEventListener('submit', e => {
+      e.preventDefault();
+      const id = document.getElementById('mkf-id').value;
+      const data = { nama: document.getElementById('mkf-nama').value, prodi_id: parseInt(document.getElementById('mkf-prodi').value), dosen_id: parseInt(document.getElementById('mkf-dosen').value), deskripsi: document.getElementById('mkf-desc').value, sks: parseInt(document.getElementById('mkf-sks').value) };
+      if (id) { const i = PoliData.matkul.findIndex(m => m.id == id); if (i !== -1) Object.assign(PoliData.matkul[i], data); }
+      else { PoliData.matkul.push({ id: Utils.generateId(PoliData.matkul), ...data }); }
+      saveData(); closeModal(); render(); Utils.showToast(id ? 'Mata kuliah diperbarui' : 'Mata kuliah ditambahkan');
+    });
+    render();
+  </script>
+</body>
+</html>

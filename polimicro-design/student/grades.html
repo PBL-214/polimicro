@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Nilai - Polimicro</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="../assets/css/custom.css">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-50" style="background:#faf8f5">
+  <div id="app"></div>
+  <script src="../assets/js/data.js"></script><script src="../assets/js/auth.js"></script><script src="../assets/js/utils.js"></script><script src="../assets/js/sidebar.js"></script>
+  <script>
+    if (!Auth.requireAuth(['mahasiswa'])) throw '';
+    const user = Auth.getCurrentUser();
+    const enrolled = PoliData.getEnrolledMatkul(user.id);
+    const mySubs = PoliData.getSubmissionsByMahasiswa(user.id);
+    const graded = mySubs.filter(s => s.nilai !== null);
+    const avg = graded.length ? Math.round(graded.reduce((a,s) => a+s.nilai,0) / graded.length) : 0;
+
+    function getGrade(n) {
+      if (n >= 85) return { letter: 'A', color: 'text-green-600 bg-green-100' };
+      if (n >= 75) return { letter: 'B', color: 'text-blue-600 bg-blue-100' };
+      if (n >= 60) return { letter: 'C', color: 'text-yellow-600 bg-yellow-100' };
+      return { letter: 'D', color: 'text-red-600 bg-red-100' };
+    }
+
+    document.getElementById('app').innerHTML = buildSidebar('mahasiswa', 'grades') + `
+    <main class="p-6 lg:p-8 fade-in">
+      <h1 class="text-2xl font-bold text-gray-900 mb-2">Nilai Saya</h1>
+      <p class="text-gray-500 mb-6">Lihat nilai tugas yang sudah dinilai oleh dosen</p>
+
+      <!-- Summary -->
+      <div class="grid grid-cols-3 gap-4 mb-8">
+        <div class="bg-white rounded-2xl border border-gray-100 p-5 text-center">
+          <p class="text-3xl font-bold text-green-600">${avg}</p><p class="text-xs text-gray-400 mt-1">Rata-rata Nilai</p>
+        </div>
+        <div class="bg-white rounded-2xl border border-gray-100 p-5 text-center">
+          <p class="text-3xl font-bold text-blue-600">${graded.length}</p><p class="text-xs text-gray-400 mt-1">Tugas Dinilai</p>
+        </div>
+        <div class="bg-white rounded-2xl border border-gray-100 p-5 text-center">
+          <p class="text-3xl font-bold text-gray-600">${mySubs.length - graded.length}</p><p class="text-xs text-gray-400 mt-1">Menunggu Nilai</p>
+        </div>
+      </div>
+
+      <!-- Grades Table -->
+      <div class="bg-white rounded-2xl border border-gray-100 overflow-hidden">
+        <div class="p-5 border-b border-gray-50"><h3 class="font-bold text-gray-900">Daftar Nilai</h3></div>
+        <div class="overflow-x-auto">
+          <table class="w-full text-sm">
+            <thead><tr class="bg-gray-50 text-left"><th class="px-5 py-3 font-semibold text-gray-600">Tugas</th><th class="px-5 py-3 font-semibold text-gray-600">Mata Kuliah</th><th class="px-5 py-3 font-semibold text-gray-600">Dikumpul</th><th class="px-5 py-3 font-semibold text-gray-600 text-center">Nilai</th><th class="px-5 py-3 font-semibold text-gray-600 text-center">Grade</th><th class="px-5 py-3 font-semibold text-gray-600">Feedback</th></tr></thead>
+            <tbody class="divide-y divide-gray-50">
+              ${mySubs.map(s => {
+                const tugas = PoliData.tugas.find(t => t.id === s.tugas_id);
+                const matkul = tugas ? PoliData.getMatkulById(tugas.matkul_id) : null;
+                const g = s.nilai !== null ? getGrade(s.nilai) : null;
+                return `<tr class="hover:bg-gray-50 transition">
+                  <td class="px-5 py-4 font-medium">${tugas ? tugas.judul : '-'}</td>
+                  <td class="px-5 py-4 text-gray-500">${matkul ? matkul.nama : '-'}</td>
+                  <td class="px-5 py-4 text-gray-400">${Utils.formatShortDate(s.submitted_at)}</td>
+                  <td class="px-5 py-4 text-center font-bold">${s.nilai !== null ? s.nilai : '<span class="text-gray-300">-</span>'}</td>
+                  <td class="px-5 py-4 text-center">${g ? `<span class="px-3 py-1 rounded-full text-xs font-bold ${g.color}">${g.letter}</span>` : '<span class="text-gray-300">-</span>'}</td>
+                  <td class="px-5 py-4 text-gray-500 text-xs max-w-[200px] truncate">${s.feedback || '-'}</td>
+                </tr>`;
+              }).join('')}
+              ${mySubs.length === 0 ? '<tr><td colspan="6" class="px-5 py-12 text-center text-gray-400">Belum ada nilai</td></tr>' : ''}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </main>` + closeSidebarLayout();
+  </script>
+</body>
+</html>

@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mata Kuliah Saya - Polimicro</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="../assets/css/custom.css">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-50" style="background:#faf8f5">
+  <div id="app"></div>
+  <script src="../assets/js/data.js"></script><script src="../assets/js/auth.js"></script><script src="../assets/js/utils.js"></script><script src="../assets/js/sidebar.js"></script>
+  <script>
+    if (!Auth.requireAuth(['mahasiswa'])) throw '';
+    const user = Auth.getCurrentUser();
+    const enrolled = PoliData.getEnrolledMatkul(user.id);
+    document.getElementById('app').innerHTML = buildSidebar('mahasiswa', 'my-courses') + `
+    <main class="p-6 lg:p-8 fade-in">
+      <h1 class="text-2xl font-bold text-gray-900 mb-2">Mata Kuliah Saya</h1>
+      <p class="text-gray-500 mb-6">Daftar mata kuliah yang Anda ikuti</p>
+      <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+        ${enrolled.map(m => {
+          const prodi = PoliData.getProdiById(m.prodi_id);
+          const dosen = PoliData.getUserById(m.dosen_id);
+          const materiCount = PoliData.getMateriByMatkul(m.id).length;
+          const tugasCount = PoliData.getTugasByMatkul(m.id).length;
+          return `<div class="bg-white rounded-2xl border border-gray-100 overflow-hidden card-hover">
+            <div class="gradient-card p-5"><h3 class="font-bold text-green-900">${m.nama}</h3><p class="text-green-700 text-xs mt-1">${prodi ? prodi.nama : ''}</p></div>
+            <div class="p-5">
+              <p class="text-gray-500 text-sm mb-4">${m.deskripsi}</p>
+              <div class="flex items-center gap-2 mb-4"><div class="w-7 h-7 rounded-full bg-green-100 flex items-center justify-center text-xs font-bold text-green-700">${dosen ? Utils.getInitials(dosen.nama) : '?'}</div><span class="text-xs text-gray-500">${dosen ? dosen.nama : '-'}</span></div>
+              <div class="flex gap-4 text-xs text-gray-400 mb-4">
+                <span><i class="fas fa-file-alt mr-1"></i>${materiCount} Materi</span>
+                <span><i class="fas fa-tasks mr-1"></i>${tugasCount} Tugas</span>
+                <span><i class="fas fa-credit-card mr-1"></i>${m.sks} SKS</span>
+              </div>
+              <div class="flex gap-2">
+                <a href="materials.html?matkul=${m.id}" class="flex-1 text-center py-2 text-sm btn-primary text-white rounded-xl font-medium">Materi</a>
+                <a href="assignments.html?matkul=${m.id}" class="flex-1 text-center py-2 text-sm bg-gray-100 text-gray-700 rounded-xl font-medium hover:bg-gray-200 transition">Tugas</a>
+              </div>
+            </div>
+          </div>`;
+        }).join('')}
+        ${enrolled.length === 0 ? '<div class="col-span-full text-center py-16"><i class="fas fa-book-open text-4xl text-gray-300 mb-4"></i><p class="text-gray-400">Belum ada mata kuliah. <a href="../programs.html" class="text-green-600 font-medium">Daftar program</a> terlebih dahulu.</p></div>' : ''}
+      </div>
+    </main>` + closeSidebarLayout();
+  </script>
+</body>
+</html>

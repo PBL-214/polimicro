@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kelola Dosen - Admin Akademik - Polimicro</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="../assets/css/custom.css">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-50" style="background:#faf8f5">
+  <div id="app"></div>
+  <div id="dosen-modal" class="fixed inset-0 z-50 hidden items-center justify-center modal-overlay">
+    <div class="bg-white rounded-3xl shadow-2xl p-8 max-w-lg w-full mx-4 fade-in">
+      <h3 class="text-xl font-bold mb-4" id="dm-title">Tambah Dosen</h3>
+      <form id="dosen-form" class="space-y-4">
+        <input type="hidden" id="df-id">
+        <div><label class="block text-sm font-medium text-gray-600 mb-1">Nama Lengkap</label><input type="text" id="df-nama" required class="w-full px-4 py-3 rounded-xl border border-gray-200"></div>
+        <div class="grid grid-cols-2 gap-4">
+          <div><label class="block text-sm font-medium text-gray-600 mb-1">Email</label><input type="email" id="df-email" required class="w-full px-4 py-3 rounded-xl border border-gray-200"></div>
+          <div><label class="block text-sm font-medium text-gray-600 mb-1">NIP</label><input type="text" id="df-nip" class="w-full px-4 py-3 rounded-xl border border-gray-200"></div>
+        </div>
+        <div class="grid grid-cols-2 gap-4">
+          <div><label class="block text-sm font-medium text-gray-600 mb-1">No. Telepon</label><input type="tel" id="df-phone" class="w-full px-4 py-3 rounded-xl border border-gray-200"></div>
+          <div><label class="block text-sm font-medium text-gray-600 mb-1">Bidang</label><input type="text" id="df-bidang" class="w-full px-4 py-3 rounded-xl border border-gray-200"></div>
+        </div>
+        <div><label class="block text-sm font-medium text-gray-600 mb-1">Alamat</label><input type="text" id="df-address" class="w-full px-4 py-3 rounded-xl border border-gray-200"></div>
+        <div class="flex gap-3">
+          <button type="button" onclick="closeModal()" class="flex-1 py-3 rounded-xl border border-gray-200 text-gray-600 font-medium">Batal</button>
+          <button type="submit" class="flex-1 py-3 btn-primary text-white rounded-xl font-semibold">Simpan</button>
+        </div>
+      </form>
+    </div>
+  </div>
+  <script src="../assets/js/data.js"></script><script src="../assets/js/auth.js"></script><script src="../assets/js/utils.js"></script><script src="../assets/js/sidebar.js"></script>
+  <script>
+    if (!Auth.requireAuth(['admin_akademik'])) throw '';
+
+    function render() {
+      const dosenList = PoliData.getDosenList();
+      document.getElementById('app').innerHTML = buildSidebar('admin_akademik', 'lecturers') + `
+      <main class="p-6 lg:p-8 fade-in">
+        <div class="flex items-center justify-between mb-6">
+          <div><h1 class="text-2xl font-bold text-gray-900">Kelola Data Dosen</h1><p class="text-gray-500">Tambah, edit, atau hapus data dosen</p></div>
+          <button onclick="openAdd()" class="px-5 py-3 btn-primary text-white rounded-xl font-semibold text-sm"><i class="fas fa-plus mr-2"></i>Tambah Dosen</button>
+        </div>
+        <div class="bg-white rounded-2xl border border-gray-100 overflow-hidden">
+          <div class="overflow-x-auto"><table class="w-full text-sm">
+            <thead><tr class="bg-gray-50" style="background:#faf8f5"><th class="px-5 py-3 text-left font-semibold text-gray-600">Dosen</th><th class="px-5 py-3 text-left font-semibold text-gray-600">NIP</th><th class="px-5 py-3 text-left font-semibold text-gray-600">Bidang</th><th class="px-5 py-3 text-left font-semibold text-gray-600">Email</th><th class="px-5 py-3 text-center font-semibold text-gray-600">Matkul</th><th class="px-5 py-3 text-center font-semibold text-gray-600">Aksi</th></tr></thead>
+            <tbody class="divide-y divide-gray-50">
+              ${dosenList.map(d => {
+                const matkulCount = PoliData.getMatkulByDosen(d.id).length;
+                return `<tr class="hover:bg-gray-50">
+                  <td class="px-5 py-4"><div class="flex items-center gap-3"><div class="w-10 h-10 rounded-full gradient-primary flex items-center justify-center text-white text-xs font-bold">${Utils.getInitials(d.nama)}</div><div><p class="font-medium">${d.nama}</p><p class="text-xs text-gray-400">${d.phone || ''}</p></div></div></td>
+                  <td class="px-5 py-4 text-gray-500 font-mono text-xs">${d.nip || '-'}</td>
+                  <td class="px-5 py-4 text-gray-500 text-xs">${d.bidang || '-'}</td>
+                  <td class="px-5 py-4 text-gray-500 text-xs">${d.email}</td>
+                  <td class="px-5 py-4 text-center"><span class="px-3 py-1 rounded-full text-xs font-semibold bg-green-100 text-green-700">${matkulCount}</span></td>
+                  <td class="px-5 py-4 text-center"><div class="flex gap-2 justify-center">
+                    <button onclick="editDosen(${d.id})" class="px-3 py-2 bg-blue-50 text-blue-600 rounded-lg text-xs hover:bg-blue-100"><i class="fas fa-edit"></i></button>
+                    <button onclick="deleteDosen(${d.id})" class="px-3 py-2 bg-red-50 text-red-600 rounded-lg text-xs hover:bg-red-100"><i class="fas fa-trash"></i></button>
+                  </div></td>
+                </tr>`;
+              }).join('')}
+            </tbody>
+          </table></div>
+        </div>
+      </main>` + closeSidebarLayout();
+    }
+
+    function openAdd() { document.getElementById('dm-title').textContent = 'Tambah Dosen'; ['df-id','df-nama','df-email','df-nip','df-phone','df-bidang','df-address'].forEach(id => document.getElementById(id).value = ''); showModal(); }
+    function editDosen(id) { const d = PoliData.getUserById(id); if (!d) return; document.getElementById('dm-title').textContent = 'Edit Dosen'; document.getElementById('df-id').value = d.id; document.getElementById('df-nama').value = d.nama; document.getElementById('df-email').value = d.email; document.getElementById('df-nip').value = d.nip || ''; document.getElementById('df-phone').value = d.phone || ''; document.getElementById('df-bidang').value = d.bidang || ''; document.getElementById('df-address').value = d.address || ''; showModal(); }
+    function showModal() { document.getElementById('dosen-modal').classList.remove('hidden'); document.getElementById('dosen-modal').classList.add('flex'); }
+    function closeModal() { document.getElementById('dosen-modal').classList.add('hidden'); document.getElementById('dosen-modal').classList.remove('flex'); }
+    function deleteDosen(id) { if (!confirm('Hapus dosen ini?')) return; PoliData.users = PoliData.users.filter(u => u.id !== id); saveData(); render(); Utils.showToast('Dosen dihapus'); }
+
+    document.getElementById('dosen-form').addEventListener('submit', e => {
+      e.preventDefault();
+      const id = document.getElementById('df-id').value;
+      const data = { nama: document.getElementById('df-nama').value, email: document.getElementById('df-email').value, nip: document.getElementById('df-nip').value, phone: document.getElementById('df-phone').value, bidang: document.getElementById('df-bidang').value, address: document.getElementById('df-address').value };
+      if (id) { const i = PoliData.users.findIndex(u => u.id == id); if (i !== -1) Object.assign(PoliData.users[i], data); }
+      else { PoliData.users.push({ id: Utils.generateId(PoliData.users), ...data, password: 'dosen123', role: 'dosen', avatar: null }); }
+      saveData(); closeModal(); render(); Utils.showToast(id ? 'Data dosen diperbarui' : 'Dosen ditambahkan');
+    });
+    render();
+  </script>
+</body>
+</html>

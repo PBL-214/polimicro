@@ -1,0 +1,89 @@
+<?php
+
+use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\AuthController;
+use App\Http\Controllers\ProgramController;
+
+// ---- PUBLIC ROUTES ----
+Route::get('/', fn() => view('welcome'))->name('home');
+Route::get('/faq', fn() => view('faq'))->name('faq');
+
+Route::middleware('guest')->group(function () {
+    Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
+    Route::post('/login', [AuthController::class, 'login'])->middleware('throttle:5,1');
+    Route::get('/register', [AuthController::class, 'showRegister'])->name('register');
+    Route::post('/register', [AuthController::class, 'register'])->middleware('throttle:3,1');
+    Route::get('/forgot-password', [AuthController::class, 'showForgotPassword'])->name('forgot-password');
+    Route::post('/forgot-password', [AuthController::class, 'forgotPassword'])->middleware('throttle:3,1');
+});
+
+Route::post('/logout', [AuthController::class, 'logout'])->name('logout')->middleware('auth');
+
+Route::get('/programs', [ProgramController::class, 'index'])->name('programs');
+Route::post('/programs/enroll', [ProgramController::class, 'enroll'])->name('programs.enroll')->middleware('auth');
+
+// ---- MAHASISWA ROUTES ----
+Route::prefix('mahasiswa')->middleware(['auth', 'role:mahasiswa'])->name('mahasiswa.')->group(function () {
+    Route::get('/dashboard', [\App\Http\Controllers\Mahasiswa\DashboardController::class, 'index'])->name('dashboard');
+    Route::get('/courses', [\App\Http\Controllers\Mahasiswa\CourseController::class, 'index'])->name('courses');
+    Route::get('/materials', [\App\Http\Controllers\Mahasiswa\MaterialController::class, 'index'])->name('materials');
+    Route::get('/assignments', [\App\Http\Controllers\Mahasiswa\AssignmentController::class, 'index'])->name('assignments');
+    Route::post('/assignments/submit', [\App\Http\Controllers\Mahasiswa\AssignmentController::class, 'submit'])->name('assignments.submit');
+    Route::get('/grades', [\App\Http\Controllers\Mahasiswa\GradeController::class, 'index'])->name('grades');
+    Route::get('/certificates', [\App\Http\Controllers\Mahasiswa\CertificateController::class, 'index'])->name('certificates');
+    Route::get('/profile', [\App\Http\Controllers\Mahasiswa\ProfileController::class, 'index'])->name('profile');
+    Route::put('/profile', [\App\Http\Controllers\Mahasiswa\ProfileController::class, 'update'])->name('profile.update');
+    Route::put('/profile/password', [\App\Http\Controllers\Mahasiswa\ProfileController::class, 'changePassword'])->name('profile.password');
+});
+
+// ---- DOSEN ROUTES ----
+Route::prefix('dosen')->middleware(['auth', 'role:dosen'])->name('dosen.')->group(function () {
+    Route::get('/dashboard', [\App\Http\Controllers\Dosen\DashboardController::class, 'index'])->name('dashboard');
+    Route::get('/courses', [\App\Http\Controllers\Dosen\CourseController::class, 'index'])->name('courses');
+    Route::get('/materials', [\App\Http\Controllers\Dosen\MaterialController::class, 'index'])->name('materials');
+    Route::post('/materials', [\App\Http\Controllers\Dosen\MaterialController::class, 'store'])->name('materials.store');
+    Route::put('/materials/{materi}', [\App\Http\Controllers\Dosen\MaterialController::class, 'update'])->name('materials.update');
+    Route::delete('/materials/{materi}', [\App\Http\Controllers\Dosen\MaterialController::class, 'destroy'])->name('materials.destroy');
+    Route::get('/assignments', [\App\Http\Controllers\Dosen\AssignmentController::class, 'index'])->name('assignments');
+    Route::post('/assignments', [\App\Http\Controllers\Dosen\AssignmentController::class, 'store'])->name('assignments.store');
+    Route::put('/assignments/{tugas}', [\App\Http\Controllers\Dosen\AssignmentController::class, 'update'])->name('assignments.update');
+    Route::delete('/assignments/{tugas}', [\App\Http\Controllers\Dosen\AssignmentController::class, 'destroy'])->name('assignments.destroy');
+    Route::get('/submissions', [\App\Http\Controllers\Dosen\SubmissionController::class, 'index'])->name('submissions');
+    Route::put('/submissions/{submission}/grade', [\App\Http\Controllers\Dosen\SubmissionController::class, 'grade'])->name('submissions.grade');
+    Route::get('/students', [\App\Http\Controllers\Dosen\StudentController::class, 'index'])->name('students');
+});
+
+// ---- ADMIN PIC ROUTES ----
+Route::prefix('admin-pic')->middleware(['auth', 'role:admin_pic'])->name('admin-pic.')->group(function () {
+    Route::get('/dashboard', [\App\Http\Controllers\AdminPic\DashboardController::class, 'index'])->name('dashboard');
+    Route::get('/verification', [\App\Http\Controllers\AdminPic\VerificationController::class, 'index'])->name('verification');
+    Route::put('/verification/{pendaftaran}', [\App\Http\Controllers\AdminPic\VerificationController::class, 'verify'])->name('verification.verify');
+    Route::get('/students', [\App\Http\Controllers\AdminPic\StudentController::class, 'index'])->name('students');
+    Route::get('/courses', [\App\Http\Controllers\AdminPic\CourseController::class, 'index'])->name('courses');
+    Route::post('/courses', [\App\Http\Controllers\AdminPic\CourseController::class, 'store'])->name('courses.store');
+    Route::put('/courses/{makul}', [\App\Http\Controllers\AdminPic\CourseController::class, 'update'])->name('courses.update');
+    Route::delete('/courses/{makul}', [\App\Http\Controllers\AdminPic\CourseController::class, 'destroy'])->name('courses.destroy');
+});
+
+// ---- ADMIN AKADEMIK ROUTES ----
+Route::prefix('admin-akademik')->middleware(['auth', 'role:admin_akademik'])->name('admin-akademik.')->group(function () {
+    Route::get('/dashboard', [\App\Http\Controllers\AdminAkademik\DashboardController::class, 'index'])->name('dashboard');
+    Route::get('/programs', [\App\Http\Controllers\AdminAkademik\ProgramController::class, 'index'])->name('programs');
+    Route::post('/programs', [\App\Http\Controllers\AdminAkademik\ProgramController::class, 'store'])->name('programs.store');
+    Route::put('/programs/{prodi}', [\App\Http\Controllers\AdminAkademik\ProgramController::class, 'update'])->name('programs.update');
+    Route::delete('/programs/{prodi}', [\App\Http\Controllers\AdminAkademik\ProgramController::class, 'destroy'])->name('programs.destroy');
+    Route::get('/lecturers', [\App\Http\Controllers\AdminAkademik\LecturerController::class, 'index'])->name('lecturers');
+    Route::post('/lecturers', [\App\Http\Controllers\AdminAkademik\LecturerController::class, 'store'])->name('lecturers.store');
+    Route::put('/lecturers/{dosen}', [\App\Http\Controllers\AdminAkademik\LecturerController::class, 'update'])->name('lecturers.update');
+    Route::delete('/lecturers/{dosen}', [\App\Http\Controllers\AdminAkademik\LecturerController::class, 'destroy'])->name('lecturers.destroy');
+    Route::get('/certificates', [\App\Http\Controllers\AdminAkademik\CertificateController::class, 'index'])->name('certificates');
+    Route::post('/certificates', [\App\Http\Controllers\AdminAkademik\CertificateController::class, 'store'])->name('certificates.store');
+    Route::delete('/certificates/{sertifikat}', [\App\Http\Controllers\AdminAkademik\CertificateController::class, 'destroy'])->name('certificates.destroy');
+});
+
+// Notifications
+Route::get('/notifications/{notification}/click', function($notification) {
+    $notif = auth()->user()->notifications()->findOrFail($notification);
+    $notif->markAsRead();
+    return redirect($notif->data['url'] ?? route(auth()->user()->getDashboardRoute()));
+})->middleware('auth')->name('notifications.click');

@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard Admin PIC - Polimicro</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="../assets/css/custom.css">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
+</head>
+<body class="bg-gray-50" style="background:#faf8f5">
+  <div id="app"></div>
+  <script src="../assets/js/data.js"></script><script src="../assets/js/auth.js"></script><script src="../assets/js/utils.js"></script><script src="../assets/js/sidebar.js"></script>
+  <script>
+    if (!Auth.requireAuth(['admin_pic'])) throw '';
+    const totalMhs = PoliData.getMahasiswaList().length;
+    const pending = PoliData.getPendingPendaftaran().length;
+    const totalMatkul = PoliData.matkul.length;
+    const activeProdi = PoliData.getActiveProdi().length;
+    const accepted = PoliData.pendaftaran.filter(p => p.status === 'diterima').length;
+    const rejected = PoliData.pendaftaran.filter(p => p.status === 'ditolak').length;
+
+    document.getElementById('app').innerHTML = buildSidebar('admin_pic', 'dashboard') + `
+    <main class="p-6 lg:p-8 fade-in">
+      <div class="flex items-center justify-between mb-8">
+        <div><h1 class="text-2xl font-bold text-gray-900">Dashboard</h1><p class="text-gray-500">Kelola dan monitor aktivitas microcredential</p></div>
+        <div class="flex gap-3">
+          <a href="verification.html" class="px-5 py-3 btn-primary text-white rounded-xl font-semibold text-sm"><i class="fas fa-user-check mr-2"></i>Verifikasi</a>
+        </div>
+      </div>
+
+      <!-- Stats Cards (Green theme like reference) -->
+      <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+        <div class="rounded-2xl p-5 card-hover gradient-card border border-green-200">
+          <div class="flex items-center justify-between mb-3"><div class="w-10 h-10 rounded-xl bg-green-600 flex items-center justify-center"><i class="fas fa-users text-white"></i></div><span class="w-8 h-8 rounded-full bg-white/60 flex items-center justify-center"><i class="fas fa-arrow-up text-green-700 text-xs"></i></span></div>
+          <p class="text-3xl font-bold text-green-900">${totalMhs}</p><p class="text-sm text-green-700 mt-1">Total Mahasiswa</p>
+          <p class="text-xs text-green-600 mt-2"><i class="fas fa-chart-line mr-1"></i>Aktif</p>
+        </div>
+        <div class="rounded-2xl p-5 card-hover bg-white border border-gray-100" style="border-color:#e8e4df">
+          <div class="flex items-center justify-between mb-3"><div class="w-10 h-10 rounded-xl bg-amber-100 flex items-center justify-center"><i class="fas fa-clock text-amber-600"></i></div><span class="w-8 h-8 rounded-full bg-amber-50 flex items-center justify-center"><i class="fas fa-arrow-up text-amber-600 text-xs"></i></span></div>
+          <p class="text-3xl font-bold text-gray-900">${pending}</p><p class="text-sm text-gray-500 mt-1">Menunggu Verifikasi</p>
+          <p class="text-xs text-amber-600 mt-2"><i class="fas fa-exclamation-circle mr-1"></i>Perlu tindakan</p>
+        </div>
+        <div class="rounded-2xl p-5 card-hover bg-white border border-gray-100" style="border-color:#e8e4df">
+          <div class="flex items-center justify-between mb-3"><div class="w-10 h-10 rounded-xl bg-blue-100 flex items-center justify-center"><i class="fas fa-book text-blue-600"></i></div></div>
+          <p class="text-3xl font-bold text-gray-900">${totalMatkul}</p><p class="text-sm text-gray-500 mt-1">Total Mata Kuliah</p>
+        </div>
+        <div class="rounded-2xl p-5 card-hover bg-white border border-gray-100" style="border-color:#e8e4df">
+          <div class="flex items-center justify-between mb-3"><div class="w-10 h-10 rounded-xl bg-purple-100 flex items-center justify-center"><i class="fas fa-university text-purple-600"></i></div></div>
+          <p class="text-3xl font-bold text-gray-900">${activeProdi}</p><p class="text-sm text-gray-500 mt-1">Prodi Aktif</p>
+        </div>
+      </div>
+
+      <div class="grid lg:grid-cols-3 gap-6">
+        <!-- Chart -->
+        <div class="lg:col-span-2 bg-white rounded-2xl border border-gray-100 p-6">
+          <h2 class="font-bold text-gray-900 mb-4"><i class="fas fa-chart-bar text-green-600 mr-2"></i>Statistik Pendaftaran</h2>
+          <canvas id="chart1" height="120"></canvas>
+        </div>
+        <!-- Recent Activity -->
+        <div class="bg-white rounded-2xl border border-gray-100 p-6">
+          <h2 class="font-bold text-gray-900 mb-4"><i class="fas fa-history text-green-600 mr-2"></i>Aktivitas Terbaru</h2>
+          <div class="space-y-4">
+            ${PoliData.pendaftaran.slice(-5).reverse().map(p => {
+              const mhs = PoliData.getUserById(p.mahasiswa_id);
+              const prodi = PoliData.getProdiById(p.prodi_id);
+              return `<div class="flex items-center gap-3 p-3 rounded-xl bg-gray-50">
+                <div class="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center text-xs font-bold text-green-700">${mhs ? Utils.getInitials(mhs.nama) : '?'}</div>
+                <div class="flex-1 min-w-0"><p class="text-sm font-medium truncate">${mhs ? mhs.nama : '-'}</p><p class="text-xs text-gray-400 truncate">${prodi ? prodi.nama : '-'}</p></div>
+                ${Utils.statusBadge(p.status)}
+              </div>`;
+            }).join('')}
+          </div>
+        </div>
+      </div>
+    </main>` + closeSidebarLayout();
+
+    // Chart
+    new Chart(document.getElementById('chart1'), {
+      type: 'bar',
+      data: {
+        labels: PoliData.getActiveProdi().map(p => p.nama),
+        datasets: [
+          { label: 'Diterima', data: PoliData.getActiveProdi().map(p => PoliData.getPendaftaranByProdi(p.id).filter(x => x.status === 'diterima').length), backgroundColor: '#4CAF50', borderRadius: 8 },
+          { label: 'Pending', data: PoliData.getActiveProdi().map(p => PoliData.getPendaftaranByProdi(p.id).filter(x => x.status === 'pending').length), backgroundColor: '#FFC107', borderRadius: 8 },
+          { label: 'Ditolak', data: PoliData.getActiveProdi().map(p => PoliData.getPendaftaranByProdi(p.id).filter(x => x.status === 'ditolak').length), backgroundColor: '#EF4444', borderRadius: 8 }
+        ]
+      },
+      options: { responsive: true, plugins: { legend: { position: 'bottom' } }, scales: { y: { beginAtZero: true, ticks: { stepSize: 1 } } } }
+    });
+  </script>
+</body>
+</html>

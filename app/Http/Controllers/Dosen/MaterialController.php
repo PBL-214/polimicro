@@ -1,0 +1,99 @@
+<?php
+
+namespace App\Http\Controllers\Dosen;
+
+use App\Http\Controllers\Controller;
+use App\Models\Materi;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Symfony\Component\HttpFoundation\Response;
+
+class MaterialController extends Controller
+{
+    public function index(Request $request)
+    {
+        $user = Auth::user();
+        $myMatkul = $user->matkulDiampu;
+        $filterMatkul = $request->query('matkul');
+        return view('dosen.materials', compact('myMatkul', 'filterMatkul'));
+    }
+
+    public function store(Request $request)
+    {
+        $request->validate([
+            'makul_id' => 'required|exists:makul,id',
+            'nama_materi' => 'required|string|max:100',
+            'deskripsi_materi' => 'required|string|max:5000',
+            'file_materi' => 'nullable|file|max:2048',
+        ]);
+
+        // Validate file extension manually (avoids fileinfo dependency)
+        if ($request->hasFile('file_materi')) {
+            $allowed = ['pdf', 'doc', 'docx', 'zip', 'rar'];
+            $ext = strtolower($request->file('file_materi')->getClientOriginalExtension());
+            if (!in_array($ext, $allowed)) {
+                return back()->withErrors(['file_materi' => 'Format file tidak diizinkan. Gunakan: PDF, DOC, DOCX, ZIP, atau RAR.'])->withInput();
+            }
+        }
+
+        // S1: Verify ownership — dosen can only add to their own matkul
+        $user = Auth::user();
+        abort_unless(
+            $user->matkulDiampu()->where('id', $request->makul_id)->exists(),
+            Response::HTTP_FORBIDDEN,
+            'Anda tidak berhak mengakses mata kuliah ini.'
+        );
+
+        $kode = 'MAT' . str_pad(Materi::max('id') + 1, 4, '0', STR_PAD_LEFT);
+
+        $filePath = null;
+        if ($request->hasFile('file_materi')) {
+            $filePath = $request->file('file_materi')->store('materials', 'public');
+        }
+
+        Materi::create([
+            'kode_materi' => $kode,
+            'nama_materi' => $request->nama_materi,
+            'deskripsi_materi' => $request->deskripsi_materi,
+            'file_materi' => $filePath,
+            'makul_id' => $request->makul_id,
+        ]);
+
+        return back()->with('success', 'Materi berhasil ditambahkan!');
+    }
+
+    public function update(Request $request, Materi $materi)
+    {
+        $request->validate([
+            'makul_id' => 'required|exists:makul,id',
+            'nama_materi' => 'required|string|max:100',
+            'deskripsi_materi' => 'required|string|max:5000',
+            'file_materi' => 'nullable|string|max:255',
+        ]);
+
+        // S1: Verify ownership
+        $user = Auth::user();
+        abort_unless(
+            $user->matkulDiampu()->where('id', $materi->makul_id)->exists(),
+            Response::HTTP_FORBIDDEN,
+            'Anda tidak berhak mengubah materi ini.'
+        );
+
+        $materi->update($request->only('makul_id', 'nama_materi', 'deskripsi_materi', 'file_materi'));
+        return back()->with('success', 'Materi berhasil diperbarui!');
+    }
+
+    public function destroy(Materi $materi)
+    {
+        // S1: Verify ownership
+        $user = Auth::user();
+        abort_unless(
+            $user->matkulDiampu()->where('id', $materi->makul_id)->exists(),
+            Response::HTTP_FORBIDDEN,
+            'Anda tidak berhak menghapus materi ini.'
+        );
+
+        $materi->delete();
+        return back()->with('success', 'Materi berhasil dihapus!');
+    }
+}

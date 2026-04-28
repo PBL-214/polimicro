@@ -1,0 +1,104 @@
+@extends('layouts.dashboard', ['activePage' => 'dashboard'])
+@section('title', 'Dashboard Admin Akademik - Polimicro')
+@section('content')
+<div class="mb-8 flex items-center justify-between">
+    <div>
+        <h1 class="text-2xl font-bold text-gray-900 font-serif">Pusat Data Akademik</h1>
+        <p class="text-gray-500 mt-1">Kelola data dosen, program studi, dan penerbitan sertifikat</p>
+    </div>
+    <div class="flex gap-2">
+        <a href="{{ route('admin-akademik.lecturers') }}" class="px-5 py-3 bg-white text-slate-800 border border-slate-200 rounded-xl font-bold text-sm hover:border-cyan-300 hover:text-cyan-600 transition"><i class="fas fa-user-plus mr-2"></i>Dosen</a>
+        <a href="{{ route('admin-akademik.programs') }}" class="px-5 py-3 bg-slate-900 text-white rounded-xl font-bold text-sm hover:bg-black transition shadow-lg shadow-black/10"><i class="fas fa-university mr-2"></i>Kelola Prodi</a>
+    </div>
+</div>
+
+<div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+    <div class="bg-white rounded-3xl p-6 border border-gray-100 card-hover">
+        <div class="w-12 h-12 rounded-2xl bg-cyan-50 flex items-center justify-center text-cyan-600 mb-4 shadow-sm border border-cyan-100"><i class="fas fa-chalkboard-teacher"></i></div>
+        <p class="text-3xl font-bold text-gray-900">{{ $totalDosen }}</p>
+        <p class="text-xs text-gray-400 font-semibold uppercase tracking-wider mt-1">Total Dosen</p>
+    </div>
+    <div class="bg-white rounded-3xl p-6 border border-gray-100 card-hover">
+        <div class="w-12 h-12 rounded-2xl bg-blue-50 flex items-center justify-center text-blue-600 mb-4 shadow-sm border border-blue-100"><i class="fas fa-university"></i></div>
+        <p class="text-3xl font-bold text-gray-900">{{ $totalProdi }}</p>
+        <p class="text-xs text-gray-400 font-semibold uppercase tracking-wider mt-1">Program Studi</p>
+    </div>
+    <div class="bg-white rounded-3xl p-6 border border-gray-100 card-hover">
+        <div class="w-12 h-12 rounded-2xl bg-amber-50 flex items-center justify-center text-amber-600 mb-4 shadow-sm border border-amber-100"><i class="fas fa-certificate"></i></div>
+        <p class="text-3xl font-bold text-gray-900">{{ $totalCerts }}</p>
+        <p class="text-xs text-gray-400 font-semibold uppercase tracking-wider mt-1">Sertifikat Terbit</p>
+    </div>
+    <div class="bg-white rounded-3xl p-6 border border-gray-100 card-hover">
+        <div class="w-12 h-12 rounded-2xl bg-purple-50 flex items-center justify-center text-purple-600 mb-4 shadow-sm border border-purple-100"><i class="fas fa-users"></i></div>
+        <p class="text-3xl font-bold text-gray-900">{{ $totalMhs }}</p>
+        <p class="text-xs text-gray-400 font-semibold uppercase tracking-wider mt-1">Total Mahasiswa</p>
+    </div>
+</div>
+
+<div class="grid lg:grid-cols-2 gap-8">
+    {{-- Student Distribution Chart --}}
+    <div class="bg-white rounded-3xl border border-gray-100 p-8">
+        <h2 class="text-xl font-bold text-gray-900 mb-6 font-serif">Distribusi Mahasiswa</h2>
+        <div class="h-64 flex items-center justify-center">
+            <canvas id="chart1"></canvas>
+        </div>
+    </div>
+
+    {{-- Lecturer List --}}
+    <div class="bg-white rounded-3xl border border-gray-100 p-8">
+        <div class="flex items-center justify-between mb-6">
+            <h2 class="text-xl font-bold text-gray-900 font-serif">Daftar Dosen</h2>
+            <a href="{{ route('admin-akademik.lecturers') }}" class="text-xs font-bold text-cyan-600 hover:underline">Lihat Semua</a>
+        </div>
+        <div class="space-y-4 max-h-[300px] overflow-y-auto pr-2 custom-scrollbar">
+            @forelse($dosenList as $d)
+                @php $mc = \App\Models\Makul::where('dosen_id', $d->id)->count(); @endphp
+                <div class="flex items-center gap-4 p-4 rounded-2xl bg-gray-50 border border-transparent hover:border-cyan-100 hover:bg-white transition duration-300">
+                    <div class="w-10 h-10 rounded-full gradient-primary flex items-center justify-center text-white text-xs font-bold shadow-md">{{ $d->getInitials() }}</div>
+                    <div class="flex-1">
+                        <p class="text-sm font-bold text-gray-900">{{ $d->name }}</p>
+                        <p class="text-[11px] text-gray-400 mt-0.5">{{ $d->bidang ?? 'Bidang Akademik' }}</p>
+                    </div>
+                    <span class="text-[10px] font-bold text-cyan-600 bg-cyan-50 px-2 py-1 rounded-lg">{{ $mc }} Matkul</span>
+                </div>
+            @empty
+                <p class="text-center text-gray-400 py-8">Belum ada data dosen</p>
+            @endforelse
+        </div>
+    </div>
+</div>
+
+@push('styles')<script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>@endpush
+@push('scripts')
+<script>
+const ctx = document.getElementById('chart1');
+new Chart(ctx, {
+    type: 'doughnut',
+    data: { 
+        labels: @json($prodiList->pluck('nama_prodi')), 
+        datasets: [{ 
+            data: @json($prodiList->map(fn($p) => $p->pendaftaranDiterima()->count())), 
+            backgroundColor: ['#0891B2','#06B6D4','#22D3EE','#0E7490','#164E63'], 
+            borderWidth: 0,
+            hoverOffset: 15
+        }] 
+    },
+    options: { 
+        maintainAspectRatio: false,
+        responsive: true, 
+        plugins: { 
+            legend: { 
+                position: 'bottom', 
+                labels: { 
+                    usePointStyle: true, 
+                    padding: 15,
+                    font: { family: 'Plus Jakarta Sans', size: 10, weight: '600' }
+                } 
+            } 
+        },
+        cutout: '65%'
+    }
+});
+</script>
+@endpush
+@endsection

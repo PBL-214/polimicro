@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard Dosen - Polimicro</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="../assets/css/custom.css">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-50" style="background:#faf8f5">
+  <div id="app"></div>
+  <script src="../assets/js/data.js"></script><script src="../assets/js/auth.js"></script><script src="../assets/js/utils.js"></script><script src="../assets/js/sidebar.js"></script>
+  <script>
+    if (!Auth.requireAuth(['dosen'])) throw '';
+    const user = Auth.getCurrentUser();
+    const myMatkul = PoliData.getMatkulByDosen(user.id);
+    let totalMateri = 0, totalTugas = 0, totalSubs = 0;
+    myMatkul.forEach(m => { totalMateri += PoliData.getMateriByMatkul(m.id).length; totalTugas += PoliData.getTugasByMatkul(m.id).length; PoliData.getTugasByMatkul(m.id).forEach(t => totalSubs += PoliData.getSubmissionsByTugas(t.id).length); });
+    // Count unique students
+    const studentIds = new Set();
+    myMatkul.forEach(m => {
+      const prodiEnroll = PoliData.getPendaftaranByProdi(m.prodi_id).filter(p => p.status === 'diterima');
+      prodiEnroll.forEach(p => studentIds.add(p.mahasiswa_id));
+    });
+
+    document.getElementById('app').innerHTML = buildSidebar('dosen', 'dashboard') + `
+    <main class="p-6 lg:p-8 fade-in">
+      <div class="mb-8"><h1 class="text-2xl font-bold text-gray-900">Dashboard Dosen</h1><p class="text-gray-500 mt-1">Kelola pembelajaran microcredential Anda</p></div>
+      <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+        <div class="bg-white rounded-2xl p-5 border border-gray-100 card-hover">
+          <div class="w-10 h-10 rounded-xl bg-green-100 flex items-center justify-center mb-3"><i class="fas fa-book-open text-green-600"></i></div>
+          <p class="text-2xl font-bold">${myMatkul.length}</p><p class="text-xs text-gray-400">Matkul Diampu</p>
+        </div>
+        <div class="bg-white rounded-2xl p-5 border border-gray-100 card-hover">
+          <div class="w-10 h-10 rounded-xl bg-blue-100 flex items-center justify-center mb-3"><i class="fas fa-file-alt text-blue-600"></i></div>
+          <p class="text-2xl font-bold">${totalMateri}</p><p class="text-xs text-gray-400">Total Materi</p>
+        </div>
+        <div class="bg-white rounded-2xl p-5 border border-gray-100 card-hover">
+          <div class="w-10 h-10 rounded-xl bg-amber-100 flex items-center justify-center mb-3"><i class="fas fa-tasks text-amber-600"></i></div>
+          <p class="text-2xl font-bold">${totalTugas}</p><p class="text-xs text-gray-400">Total Tugas</p>
+        </div>
+        <div class="bg-white rounded-2xl p-5 border border-gray-100 card-hover">
+          <div class="w-10 h-10 rounded-xl bg-purple-100 flex items-center justify-center mb-3"><i class="fas fa-users text-purple-600"></i></div>
+          <p class="text-2xl font-bold">${studentIds.size}</p><p class="text-xs text-gray-400">Total Mahasiswa</p>
+        </div>
+      </div>
+      <div class="grid lg:grid-cols-2 gap-6">
+        <div class="bg-white rounded-2xl border border-gray-100 p-6">
+          <h2 class="font-bold text-gray-900 mb-4">Matkul Diampu</h2>
+          <div class="space-y-3">${myMatkul.map(m => {
+            const prodi = PoliData.getProdiById(m.prodi_id);
+            return `<a href="my-courses.html" class="flex items-center gap-4 p-4 rounded-xl bg-gray-50 hover:bg-green-50 transition">
+              <div class="w-10 h-10 rounded-xl gradient-primary flex items-center justify-center text-white"><i class="fas fa-book"></i></div>
+              <div><p class="font-semibold text-sm">${m.nama}</p><p class="text-xs text-gray-400">${prodi ? prodi.nama : ''} • ${m.sks} SKS</p></div>
+            </a>`;
+          }).join('')}</div>
+        </div>
+        <div class="bg-white rounded-2xl border border-gray-100 p-6">
+          <h2 class="font-bold text-gray-900 mb-4">Pengumpulan Terbaru</h2>
+          <div class="space-y-3">${PoliData.submissions.filter(s => {
+            const t = PoliData.tugas.find(t2 => t2.id === s.tugas_id);
+            return t && myMatkul.some(m => m.id === t.matkul_id);
+          }).slice(-5).reverse().map(s => {
+            const mhs = PoliData.getUserById(s.mahasiswa_id);
+            const t = PoliData.tugas.find(t2 => t2.id === s.tugas_id);
+            return `<div class="flex items-center gap-3 p-3 rounded-xl bg-gray-50">
+              <div class="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center text-xs font-bold text-green-700">${mhs ? Utils.getInitials(mhs.nama) : '?'}</div>
+              <div class="flex-1"><p class="text-sm font-medium">${mhs ? mhs.nama : '-'}</p><p class="text-xs text-gray-400">${t ? t.judul : '-'}</p></div>
+              ${s.nilai !== null ? `<span class="text-xs font-bold text-green-600">${s.nilai}</span>` : `<span class="px-2 py-1 bg-yellow-100 text-yellow-700 rounded-full text-xs">Belum dinilai</span>`}
+            </div>`;
+          }).join('')}</div>
+        </div>
+      </div>
+    </main>` + closeSidebarLayout();
+  </script>
+</body>
+</html>
