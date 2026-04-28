@@ -5,10 +5,10 @@
 <p class="text-gray-500 mb-6">Lihat nilai tugas yang sudah dinilai oleh dosen</p>
 <div class="grid grid-cols-3 gap-4 mb-8">
     <div class="bg-white rounded-2xl border border-gray-100 p-5 text-center"><p class="text-3xl font-bold text-cyan-600">{{ $avg }}</p><p class="text-xs text-gray-400 mt-1">Rata-rata Nilai</p></div>
-    <div class="bg-white rounded-2xl border border-gray-100 p-5 text-center"><p class="text-3xl font-bold text-blue-600">{{ $graded->count() }}</p><p class="text-xs text-gray-400 mt-1">Tugas Dinilai</p></div>
-    <div class="bg-white rounded-2xl border border-gray-100 p-5 text-center"><p class="text-3xl font-bold text-gray-600">{{ $submissions->count() - $graded->count() }}</p><p class="text-xs text-gray-400 mt-1">Menunggu Nilai</p></div>
+    <div class="bg-white rounded-2xl border border-gray-100 p-5 text-center"><p class="text-3xl font-bold text-blue-600">{{ $gradedCount }}</p><p class="text-xs text-gray-400 mt-1">Tugas Dinilai</p></div>
+    <div class="bg-white rounded-2xl border border-gray-100 p-5 text-center"><p class="text-3xl font-bold text-gray-600">{{ $submissions->total() - $gradedCount }}</p><p class="text-xs text-gray-400 mt-1">Total Tugas</p></div>
 </div>
-<div class="bg-white rounded-2xl border border-gray-100 overflow-hidden">
+<div class="bg-white rounded-2xl border border-gray-100 overflow-hidden mb-6">
     <div class="p-5 border-b border-gray-50"><h3 class="font-bold text-gray-900">Daftar Nilai</h3></div>
     <div class="overflow-x-auto">
         <table class="w-full text-sm">
@@ -43,5 +43,9 @@
             </tbody>
         </table>
     </div>
+</div>
+
+<div class="mt-4">
+    {{ $submissions->links() }}
 </div>
 @endsection

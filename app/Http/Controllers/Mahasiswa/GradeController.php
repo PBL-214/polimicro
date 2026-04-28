@@ -10,10 +10,12 @@ class GradeController extends Controller
     public function index()
     {
         $user = Auth::user();
-        $submissions = $user->submissions()->with(['tugas.makul'])->get();
-        $graded = $submissions->whereNotNull('nilai');
-        $avg = $graded->count() > 0 ? round($graded->avg('nilai')) : 0;
+        $submissions = $user->submissions()->with(['tugas.makul'])->latest()->paginate(5);
+        
+        $allSubmissions = $user->submissions()->get();
+        $gradedCount = $allSubmissions->whereNotNull('nilai')->count();
+        $avg = $gradedCount > 0 ? round($allSubmissions->whereNotNull('nilai')->avg('nilai')) : 0;
 
-        return view('mahasiswa.grades', compact('submissions', 'graded', 'avg'));
+        return view('mahasiswa.grades', compact('submissions', 'gradedCount', 'avg'));
     }
 }

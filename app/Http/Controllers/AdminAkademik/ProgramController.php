@@ -10,7 +10,7 @@ class ProgramController extends Controller
 {
     public function index()
     {
-        $prodiList = ProdiMikro::all();
+        $prodiList = ProdiMikro::latest()->paginate(5);
         return view('admin-akademik.programs', compact('prodiList'));
     }
 

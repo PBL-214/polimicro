@@ -26,4 +26,8 @@
         </table></div>
     </div>
 @endforeach
+
+<div class="mt-6">
+    {{ $myMatkul->links() }}
+</div>
 @endsection

@@ -28,6 +28,10 @@
     </div>
     @endforeach
 </div>
+
+<div class="mt-8">
+    {{ $prodiList->links() }}
+</div>
 @push('modals')
 <div id="prodi-modal" class="fixed inset-0 z-50 hidden items-center justify-center" style="background:rgba(15,23,42,0.6); backdrop-filter: blur(4px);">
     <div class="bg-white rounded-3xl shadow-2xl p-8 max-w-lg w-full mx-4 fade-in">

@@ -23,4 +23,8 @@
     </div>
     @endforeach
 </div>
+
+<div class="mt-8">
+    {{ $myMatkul->links() }}
+</div>
 @endsection

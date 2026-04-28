@@ -11,7 +11,7 @@ class StudentController extends Controller
     public function index(Request $request)
     {
         $user = Auth::user();
-        $myMatkul = $user->matkulDiampu()->with('prodi')->get();
+        $myMatkul = $user->matkulDiampu()->with('prodi')->paginate(5);
         return view('dosen.students', compact('myMatkul'));
     }
 }

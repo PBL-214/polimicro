@@ -14,7 +14,7 @@
     </form>
 </div>
 <div class="bg-white rounded-2xl border border-gray-100 overflow-hidden">
-    <div class="p-5 border-b border-gray-50 flex justify-between"><span class="font-bold text-gray-900">Daftar Mahasiswa</span><span class="text-sm text-gray-400">{{ $students->count() }} data</span></div>
+    <div class="p-5 border-b border-gray-50 flex justify-between"><span class="font-bold text-gray-900">Daftar Mahasiswa</span><span class="text-sm text-gray-400">Total: {{ $students->total() }}</span></div>
     <div class="overflow-x-auto"><table class="w-full text-sm">
         <thead><tr class="bg-gray-50" style="background:#faf8f5"><th class="px-5 py-3 text-left font-semibold text-gray-600">Nama</th><th class="px-5 py-3 text-left font-semibold text-gray-600">NIM</th><th class="px-5 py-3 text-left font-semibold text-gray-600">Email</th><th class="px-5 py-3 text-left font-semibold text-gray-600">Telepon</th><th class="px-5 py-3 text-center font-semibold text-gray-600">Status</th></tr></thead>
         <tbody class="divide-y divide-gray-50">
@@ -31,5 +31,9 @@
         @endforelse
         </tbody>
     </table></div>
+</div>
+
+<div class="mt-6">
+    {{ $students->withQueryString()->links() }}
 </div>
 @endsection

@@ -28,4 +28,8 @@
         <div class="col-span-full text-center py-16 bg-white rounded-2xl border border-slate-100 shadow-sm"><i class="fas fa-certificate text-4xl text-slate-300 mb-4 block"></i><p class="text-slate-500">Belum ada sertifikat.</p></div>
     @endforelse
 </div>
+
+<div class="mt-8">
+    {{ $certs->links() }}
+</div>
 @endsection

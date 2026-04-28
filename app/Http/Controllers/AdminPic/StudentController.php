@@ -31,7 +31,7 @@ class StudentController extends Controller
             });
         }
 
-        $students = $query->get();
+        $students = $query->latest()->paginate(5);
 
         return view('admin-pic.students', compact('prodiList', 'students', 'prodiFilter', 'search'));
     }

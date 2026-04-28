@@ -35,6 +35,10 @@
     </table></div>
 </div>
 
+<div class="mt-6">
+    {{ $dosenList->links() }}
+</div>
+
 @push('modals')
 {{-- Modal Tambah/Edit Dosen --}}
 <div id="dosen-modal" class="fixed inset-0 z-50 hidden items-center justify-center" style="background:rgba(15,23,42,0.6); backdrop-filter: blur(4px);">

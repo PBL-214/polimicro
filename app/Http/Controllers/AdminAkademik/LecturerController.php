@@ -11,7 +11,7 @@ class LecturerController extends Controller
 {
     public function index()
     {
-        $dosenList = User::dosen()->get();
+        $dosenList = User::dosen()->latest()->paginate(5);
         $prodiList = ProdiMikro::aktif()->orderBy('nama_prodi')->get();
         return view('admin-akademik.lecturers', compact('dosenList', 'prodiList'));
     }

@@ -13,8 +13,8 @@ class VerificationController extends Controller
 {
     public function index()
     {
-        $pendingList = Pendaftaran::pending()->with(['mahasiswa', 'prodi'])->get();
-        $historyList = Pendaftaran::where('status', '!=', 'pending')->with(['mahasiswa', 'prodi'])->latest()->get();
+        $pendingList = Pendaftaran::pending()->with(['mahasiswa', 'prodi'])->paginate(5, ['*'], 'pendingPage');
+        $historyList = Pendaftaran::where('status', '!=', 'pending')->with(['mahasiswa', 'prodi'])->latest()->paginate(5, ['*'], 'historyPage');
 
         return view('admin-pic.verification', compact('pendingList', 'historyList'));
     }
