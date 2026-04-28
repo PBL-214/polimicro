@@ -36,10 +36,10 @@
             @php
                 $badges = [
                     ['icon' => '🤖', 'label' => 'AI Expert', 'status' => $certs->where('prodi_id', 1)->count() > 0 ? 'unlocked' : 'locked'],
-                    ['icon' => '📊', 'label' => 'Data Master', 'status' => 'locked'],
-                    ['icon' => '🔒', 'label' => 'Cyber Guard', 'status' => 'locked'],
-                    ['icon' => '🎨', 'label' => 'UI/UX Pro', 'status' => 'locked'],
-                    ['icon' => '🚀', 'label' => 'Super Starter', 'status' => 'unlocked'],
+                    ['icon' => '📊', 'label' => 'Data Master', 'status' => $certs->where('prodi_id', 2)->count() > 0 ? 'unlocked' : 'locked'],
+                    ['icon' => '🔒', 'label' => 'Cyber Guard', 'status' => $certs->where('prodi_id', 3)->count() > 0 ? 'unlocked' : 'locked'],
+                    ['icon' => '🎨', 'label' => 'UI/UX Pro', 'status' => $certs->where('prodi_id', 5)->count() > 0 ? 'unlocked' : 'locked'],
+                    ['icon' => '🚀', 'label' => 'Super Starter', 'status' => $submissions->count() >= 1 ? 'unlocked' : 'locked'],
                 ];
             @endphp
             @foreach($badges as $badge)
@@ -59,15 +59,23 @@
         <div class="relative w-32 h-32 mb-4">
             <svg class="w-full h-full" viewBox="0 0 36 36">
                 <path class="text-gray-100" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="currentColor" stroke-width="3" />
-                <path class="text-cyan-600" stroke-dasharray="75, 100" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" />
+                <path class="text-cyan-600" stroke-dasharray="{{ $overallProgress }}, 100" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" />
             </svg>
             <div class="absolute inset-0 flex flex-col items-center justify-center">
-                <span class="text-2xl font-bold text-gray-900">75%</span>
+                <span class="text-2xl font-bold text-gray-900">{{ $overallProgress }}%</span>
                 <span class="text-[10px] text-gray-400 font-bold uppercase">Total</span>
             </div>
         </div>
         <h3 class="font-bold text-gray-900">Penyelesaian Program</h3>
-        <p class="text-xs text-gray-400 mt-1">Hampir mencapai target bulan ini!</p>
+        <p class="text-xs text-gray-400 mt-1">
+            @if($overallProgress >= 100)
+                Selamat! Anda telah menyelesaikan semua tugas.
+            @elseif($overallProgress >= 50)
+                Hampir mencapai target bulan ini!
+            @else
+                Terus semangat belajarnya!
+            @endif
+        </p>
     </div>
 </div>
 
@@ -90,7 +98,7 @@
                                 <p class="text-xs text-gray-400 mt-1">{{ $m->prodi->nama_prodi ?? '' }} • {{ $m->dosen->name ?? '' }}</p>
                             </div>
                             <div class="text-right">
-                                <span class="text-xs font-bold text-cyan-600 bg-cyan-50 px-2 py-1 rounded-lg">80% Selesai</span>
+                                <span class="text-xs font-bold text-cyan-600 bg-cyan-50 px-2 py-1 rounded-lg">{{ $m->progress }}% Selesai</span>
                             </div>
                         </div>
                     </a>
