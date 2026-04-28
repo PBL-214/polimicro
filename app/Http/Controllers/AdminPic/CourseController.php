@@ -20,7 +20,7 @@ class CourseController extends Controller
         if ($filter && $filter !== 'all') {
             $query->where('prodi_id', $filter);
         }
-        $matkuls = $query->latest()->paginate(5);
+        $matkuls = $query->latest()->paginate(10);
 
         return view('admin-pic.courses', compact('prodiList', 'dosenList', 'matkuls', 'filter'));
     }

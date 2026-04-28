@@ -37,7 +37,7 @@
 
     /* Gradient text */
     .text-gradient {
-      background: linear-gradient(135deg, #16a34a 0%, #10b981 60%, #34d399 100%);
+      background: linear-gradient(135deg, #06b6d4 0%, #0891b2 60%, #1e293b 100%);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       background-clip: text;
@@ -46,7 +46,7 @@
     /* Stats section dot pattern */
     #stats-section {
       background-color: #fff;
-      background-image: radial-gradient(circle, #bbf7d0 1px, transparent 1px);
+      background-image: radial-gradient(circle, #ecfeff 1px, transparent 1px);
       background-size: 24px 24px;
     }
 
@@ -56,7 +56,7 @@
     }
     .card-modern:hover {
       transform: translateY(-6px);
-      box-shadow: 0 20px 44px rgba(22, 163, 74, 0.13);
+      box-shadow: 0 20px 44px rgba(6, 182, 212, 0.13);
     }
 
     /* Program card CTA */
@@ -91,29 +91,29 @@
 
     /* CTA Section */
     .cta-section {
-      background: linear-gradient(135deg, #064e3b 0%, #065f46 50%, #047857 100%);
+      background: linear-gradient(135deg, #1e293b 0%, #334155 50%, #0f172a 100%);
       position: relative;
       overflow: hidden;
     }
     .cta-section::before {
       content: ''; position: absolute; width: 700px; height: 700px;
-      background: radial-gradient(circle, rgba(16,185,129,0.18) 0%, transparent 65%);
+      background: radial-gradient(circle, rgba(6, 182, 212, 0.18) 0%, transparent 65%);
       top: -250px; right: -100px; pointer-events: none;
     }
     .cta-section::after {
       content: ''; position: absolute; width: 450px; height: 450px;
-      background: radial-gradient(circle, rgba(52,211,153,0.12) 0%, transparent 65%);
+      background: radial-gradient(circle, rgba(8, 145, 178, 0.12) 0%, transparent 65%);
       bottom: -120px; left: -80px; pointer-events: none;
     }
 
     /* Step circle with icon */
     .step-circle {
       width: 60px; height: 60px;
-      background: linear-gradient(135deg, #16a34a, #059669);
+      background: linear-gradient(135deg, #06b6d4, #0891b2);
       border-radius: 50%;
       display: flex; align-items: center; justify-content: center;
       color: white; font-size: 1.3rem; margin: 0 auto 1rem;
-      box-shadow: 0 8px 24px rgba(22,163,74,0.32);
+      box-shadow: 0 8px 24px rgba(6, 182, 212, 0.32);
       position: relative; z-index: 1;
     }
 
@@ -140,7 +140,7 @@
     .mc-anim-step.active {
       opacity: 1; transform: scale(1) translateX(0);
       box-shadow: 0 12px 24px rgba(22, 163, 74, 0.15);
-      border-color: #bbf7d0;
+      border-color: #ecfeff;
     }
     .mc-anim-step.completed {
       opacity: 0.8; transform: scale(0.95) translateX(10px);
@@ -156,7 +156,7 @@
     }
     .mc-anim-line::after {
       content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 0%;
-      background: #16a34a; transition: height 0.5s ease;
+      background: #06b6d4; transition: height 0.5s ease;
     }
     .mc-anim-line.filled::after { height: 100%; }
     
@@ -178,7 +178,7 @@
   <nav id="navbar" class="fixed top-0 w-full z-50 transition-all duration-300 bg-transparent">
     <div class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
       <a href="{{ route('home') }}" class="flex items-center gap-3">
-        <div class="w-10 h-10 rounded-xl bg-cyan-600 flex items-center justify-center">
+        <div class="w-10 h-10 rounded-xl bg-cyan-600 flex items-center justify-center shadow-lg shadow-cyan-600/20">
           <i class="fas fa-graduation-cap text-white text-lg"></i>
         </div>
         <span class="text-2xl font-bold font-serif text-slate-800" id="logo-text">Polimicro</span>
@@ -243,7 +243,7 @@
 
   <!-- Hero Section -->
   <section id="home" class="bg-slate-50 min-h-[100vh] flex items-center relative overflow-hidden">
-    <div class="hero-blob w-[500px] h-[500px] bg-cyan-100/50 top-[-100px] right-[-100px] absolute"></div>
+    <div class="hero-blob w-[500px] h-[500px] bg-cyan-100/30 top-[-100px] right-[-100px] absolute"></div>
     <div class="hero-blob w-[350px] h-[350px] bg-slate-200/50 bottom-[10%] left-[-80px] absolute"></div>
     <div class="max-w-7xl mx-auto px-6 py-32 grid md:grid-cols-2 gap-16 items-center relative z-10">
       <div>
@@ -559,7 +559,7 @@
       </p>
       <div class="flex flex-wrap gap-4 justify-center">
         <a href="{{ route('register') }}"
-          class="px-8 py-4 rounded-2xl bg-white text-cyan-800 font-bold text-lg hover:bg-cyan-50 transition shadow-2xl inline-flex items-center gap-2">
+          class="px-8 py-4 rounded-2xl bg-white text-slate-800 font-bold text-lg hover:bg-cyan-50 transition shadow-2xl inline-flex items-center gap-2">
           <i class="fas fa-rocket"></i>Mulai Secara Gratis
         </a>
         <a href="{{ route('programs') }}"
@@ -568,6 +568,8 @@
         </a>
       </div>
     </div>
+  </section>
+>
   </section>
 
   <!-- Footer -->

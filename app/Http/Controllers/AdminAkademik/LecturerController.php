@@ -11,7 +11,7 @@ class LecturerController extends Controller
 {
     public function index()
     {
-        $dosenList = User::dosen()->latest()->paginate(5);
+        $dosenList = User::dosen()->latest()->paginate(10);
         $prodiList = ProdiMikro::aktif()->orderBy('nama_prodi')->get();
         return view('admin-akademik.lecturers', compact('dosenList', 'prodiList'));
     }
@@ -65,5 +65,30 @@ class LecturerController extends Controller
 
         $dosen->delete();
         return back()->with('success', 'Dosen berhasil dihapus!');
+    }
+
+    public function exportCsv()
+    {
+        $dosen = User::dosen()->get();
+        $filename = "data_dosen_" . date('Ymd') . ".csv";
+        $handle = fopen('php://output', 'w');
+        
+        header('Content-Type: text/csv');
+        header('Content-Disposition: attachment; filename="' . $filename . '"');
+
+        // CSV Header
+        fputcsv($handle, ['NIP', 'Nama', 'Email', 'Homebase']);
+
+        foreach ($dosen as $d) {
+            fputcsv($handle, [
+                $d->nip ?: '-',
+                $d->name,
+                $d->email,
+                $d->homebase ?: '-'
+            ]);
+        }
+
+        fclose($handle);
+        exit;
     }
 }

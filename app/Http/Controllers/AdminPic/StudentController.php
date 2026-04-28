@@ -31,8 +31,35 @@ class StudentController extends Controller
             });
         }
 
-        $students = $query->latest()->paginate(5);
+        $students = $query->latest()->paginate(10);
 
         return view('admin-pic.students', compact('prodiList', 'students', 'prodiFilter', 'search'));
+    }
+
+    public function exportCsv()
+    {
+        $students = User::mahasiswa()->with(['pendaftaran.prodi'])->get();
+        $filename = "data_mahasiswa_" . date('Ymd') . ".csv";
+        $handle = fopen('php://output', 'w');
+        
+        header('Content-Type: text/csv');
+        header('Content-Disposition: attachment; filename="' . $filename . '"');
+
+        // CSV Header
+        fputcsv($handle, ['NIM', 'Nama', 'Email', 'Program Studi', 'Status']);
+
+        foreach ($students as $s) {
+            $prodiNames = $s->pendaftaran->map(fn($p) => $p->prodi->nama_prodi ?? '-')->implode(', ');
+            fputcsv($handle, [
+                $s->nim,
+                $s->name,
+                $s->email,
+                $prodiNames,
+                $s->status
+            ]);
+        }
+
+        fclose($handle);
+        exit;
     }
 }

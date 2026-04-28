@@ -31,8 +31,8 @@
                     @endif
                 </div>
                 <div class="flex gap-2">
-                    <button onclick="editMateri({{ $mat->id }}, {{ $mat->makul_id }}, '{{ addslashes($mat->nama_materi) }}', '{{ addslashes($mat->deskripsi_materi) }}')" class="px-3 py-2 bg-blue-50 text-blue-600 rounded-lg text-xs hover:bg-blue-100"><i class="fas fa-edit"></i></button>
-                    <form method="POST" action="{{ route('dosen.materials.destroy', $mat) }}" onsubmit="return confirm('Hapus materi ini?')">@csrf @method('DELETE')<button class="px-3 py-2 bg-red-50 text-red-600 rounded-lg text-xs hover:bg-red-100"><i class="fas fa-trash"></i></button></form>
+                    <button onclick="editMateri({{ $mat->id }}, {{ $mat->makul_id }}, '{{ addslashes($mat->nama_materi) }}', '{{ addslashes($mat->deskripsi_materi) }}')" class="px-3 py-2 bg-cyan-50 text-cyan-600 rounded-lg text-xs hover:bg-cyan-100 transition border border-cyan-100"><i class="fas fa-edit"></i></button>
+                    <form method="POST" action="{{ route('dosen.materials.destroy', $mat) }}" onsubmit="return confirm('Hapus materi ini?')">@csrf @method('DELETE')<button class="px-3 py-2 bg-red-50 text-red-600 rounded-lg text-xs hover:bg-red-100 transition border border-red-100"><i class="fas fa-trash"></i></button></form>
                 </div>
             </div>
             @endforeach

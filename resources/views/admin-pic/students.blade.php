@@ -12,6 +12,9 @@
         <input type="text" name="search" id="search-box" placeholder="Cari mahasiswa..." value="{{ $search }}" class="w-full pl-11 pr-4 py-3 rounded-xl border border-gray-200 bg-white text-sm">
         @if($prodiFilter)<input type="hidden" name="prodi" value="{{ $prodiFilter }}">@endif
     </form>
+    <a href="{{ route('admin-pic.students.export') }}" class="px-5 py-3 bg-emerald-50 text-emerald-700 border border-emerald-100 rounded-xl font-bold text-sm hover:bg-emerald-100 transition inline-flex items-center gap-2">
+        <i class="fas fa-file-csv"></i> Export CSV
+    </a>
 </div>
 <div class="bg-white rounded-2xl border border-gray-100 overflow-hidden">
     <div class="p-5 border-b border-gray-50 flex justify-between"><span class="font-bold text-gray-900">Daftar Mahasiswa</span><span class="text-sm text-gray-400">Total: {{ $students->total() }}</span></div>
@@ -19,12 +22,12 @@
         <thead><tr class="bg-gray-50" style="background:#faf8f5"><th class="px-5 py-3 text-left font-semibold text-gray-600">Nama</th><th class="px-5 py-3 text-left font-semibold text-gray-600">NIM</th><th class="px-5 py-3 text-left font-semibold text-gray-600">Email</th><th class="px-5 py-3 text-left font-semibold text-gray-600">Telepon</th><th class="px-5 py-3 text-center font-semibold text-gray-600">Status</th></tr></thead>
         <tbody class="divide-y divide-gray-50">
         @forelse($students as $s)
-            <tr class="hover:bg-gray-50">
-                <td class="px-5 py-4"><div class="flex items-center gap-3"><div class="w-8 h-8 rounded-full bg-cyan-100 flex items-center justify-center text-xs font-bold text-cyan-700">{{ $s->getInitials() }}</div><span class="font-medium">{{ $s->name }}</span></div></td>
+            <tr class="hover:bg-slate-50 group transition">
+                <td class="px-5 py-4"><div class="flex items-center gap-3"><div class="w-8 h-8 rounded-full bg-cyan-100 flex items-center justify-center text-xs font-bold text-cyan-700 transition-transform group-hover:scale-110 border border-white shadow-sm">{{ $s->getInitials() }}</div><span class="font-medium">{{ $s->name }}</span></div></td>
                 <td class="px-5 py-4 text-gray-500 font-mono text-xs">{{ $s->nim ?? '-' }}</td>
                 <td class="px-5 py-4 text-gray-500 text-xs">{{ $s->email }}</td>
                 <td class="px-5 py-4 text-gray-400 text-xs">{{ $s->phone ?? '-' }}</td>
-                <td class="px-5 py-4 text-center"><span class="px-3 py-1 rounded-full text-xs font-semibold {{ $s->status === 'aktif' ? 'bg-cyan-100 text-cyan-700' : 'bg-yellow-100 text-yellow-700' }}">{{ ucfirst($s->status) }}</span></td>
+                <td class="px-5 py-4 text-center"><span class="px-3 py-1 rounded-full text-xs font-semibold {{ $s->status === 'aktif' ? 'bg-emerald-50 text-emerald-700 border border-emerald-100' : 'bg-amber-50 text-amber-700 border border-amber-100' }}">{{ ucfirst($s->status) }}</span></td>
             </tr>
         @empty
             <tr><td colspan="5" class="px-5 py-12 text-center text-gray-400">Tidak ada data</td></tr>

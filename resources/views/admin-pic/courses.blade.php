@@ -3,29 +3,44 @@
 @section('content')
 <div class="flex items-center justify-between mb-6">
     <div><h1 class="text-2xl font-bold text-gray-900">Kelola Mata Kuliah</h1><p class="text-gray-500">Kelola mata kuliah per program studi</p></div>
-    <button onclick="openMKModal()" class="px-5 py-3 btn-primary text-white rounded-xl font-semibold text-sm"><i class="fas fa-plus mr-2"></i>Tambah Matkul</button>
+<button onclick="openMKModal()" class="px-5 py-3 bg-cyan-600 text-white rounded-xl font-bold text-sm shadow-lg shadow-cyan-600/20 hover:bg-cyan-700 transition"><i class="fas fa-plus mr-2"></i>Tambah Matkul</button>
 </div>
-<select class="px-4 py-3 rounded-xl border border-gray-200 bg-white text-sm mb-6" onchange="window.location='{{ route('admin-pic.courses') }}?prodi='+this.value">
-    <option value="all">Semua Prodi</option>
-    @foreach($prodiList as $p)<option value="{{ $p->id }}" {{ $filter == $p->id ? 'selected' : '' }}>{{ $p->nama_prodi }}</option>@endforeach
-</select>
-<div class="bg-white rounded-2xl border border-gray-100 overflow-hidden">
+<div class="flex gap-4 mb-8">
+    <select class="px-4 py-3 rounded-xl border border-slate-200 bg-white text-sm focus:ring-4 focus:ring-cyan-500/10 outline-none transition" onchange="window.location='{{ route('admin-pic.courses') }}?prodi='+this.value">
+        <option value="all">Semua Program Studi</option>
+        @foreach($prodiList as $p)<option value="{{ $p->id }}" {{ $filter == $p->id ? 'selected' : '' }}>{{ $p->nama_prodi }}</option>@endforeach
+    </select>
+</div>
+<div class="bg-white rounded-3xl border border-slate-100 overflow-hidden shadow-sm">
     <div class="overflow-x-auto"><table class="w-full text-sm">
-        <thead><tr class="bg-gray-50" style="background:#faf8f5"><th class="px-5 py-3 text-left font-semibold text-gray-600">Mata Kuliah</th><th class="px-5 py-3 text-left font-semibold text-gray-600">Prodi</th><th class="px-5 py-3 text-left font-semibold text-gray-600">Dosen</th><th class="px-5 py-3 text-center font-semibold text-gray-600">SKS</th><th class="px-5 py-3 text-center font-semibold text-gray-600">Aksi</th></tr></thead>
-        <tbody class="divide-y divide-gray-50">
+        <thead><tr class="bg-slate-50/50 border-b border-slate-100"><th class="px-5 py-4 text-left font-bold text-slate-600 uppercase tracking-wider text-[10px]">Mata Kuliah</th><th class="px-5 py-4 text-left font-bold text-slate-600 uppercase tracking-wider text-[10px]">Program Studi</th><th class="px-5 py-4 text-left font-bold text-slate-600 uppercase tracking-wider text-[10px]">Dosen Pengampu</th><th class="px-5 py-4 text-center font-bold text-slate-600 uppercase tracking-wider text-[10px]">SKS</th><th class="px-5 py-4 text-center font-bold text-slate-600 uppercase tracking-wider text-[10px]">Aksi</th></tr></thead>
+        <tbody class="divide-y divide-slate-50">
         @forelse($matkuls as $m)
-            <tr class="hover:bg-gray-50">
-                <td class="px-5 py-4"><p class="font-medium">{{ $m->nama_makul }}</p><p class="text-xs text-gray-400 mt-1 max-w-xs truncate">{{ $m->deskripsi }}</p></td>
-                <td class="px-5 py-4 text-gray-500">{{ $m->prodi->nama_prodi ?? '-' }}</td>
-                <td class="px-5 py-4 text-gray-500 text-xs">{{ $m->dosen->name ?? '-' }}</td>
-                <td class="px-5 py-4 text-center">{{ $m->sks }}</td>
-                <td class="px-5 py-4 text-center"><div class="flex gap-2 justify-center">
-                    <button onclick="editMK({{ $m->id }},'{{ addslashes($m->nama_makul) }}',{{ $m->prodi_id }},{{ $m->dosen_id }},'{{ addslashes($m->deskripsi) }}',{{ $m->sks }})" class="px-3 py-2 bg-blue-50 text-blue-600 rounded-lg text-xs hover:bg-blue-100"><i class="fas fa-edit"></i></button>
-                    <form method="POST" action="{{ route('admin-pic.courses.destroy', $m) }}" onsubmit="return confirm('Apakah Anda yakin ingin menghapus mata kuliah {{ addslashes($m->nama_makul) }}?')">@csrf @method('DELETE')<button class="px-3 py-2 bg-red-50 text-red-600 rounded-lg text-xs hover:bg-red-100"><i class="fas fa-trash"></i></button></form>
-                </div></td>
+            <tr class="hover:bg-slate-50/80 transition group">
+                <td class="px-5 py-4">
+                    <p class="font-bold text-slate-800 text-sm group-hover:text-cyan-600 transition">{{ $m->nama_makul }}</p>
+                    <p class="text-[10px] text-slate-400 mt-1 max-w-xs truncate font-medium">{{ $m->deskripsi ?: 'No description provided.' }}</p>
+                </td>
+                <td class="px-5 py-4"><span class="px-2.5 py-1 rounded-lg bg-slate-100 text-slate-600 text-[10px] font-bold uppercase tracking-tighter">{{ $m->prodi->nama_prodi ?? '-' }}</span></td>
+                <td class="px-5 py-4">
+                    <div class="flex items-center gap-2">
+                        <div class="w-6 h-6 rounded-full bg-cyan-50 flex items-center justify-center text-[8px] font-bold text-cyan-600 border border-cyan-100">{{ $m->dosen ? $m->dosen->getInitials() : '?' }}</div>
+                        <span class="text-slate-500 text-xs font-medium">{{ $m->dosen->name ?? '-' }}</span>
+                    </div>
+                </td>
+                <td class="px-5 py-4 text-center font-bold text-slate-700">{{ $m->sks }}</td>
+                <td class="px-5 py-4 text-center">
+                    <div class="row-actions flex gap-2 justify-center">
+                        <button onclick="editMK({{ $m->id }},'{{ addslashes($m->nama_makul) }}',{{ $m->prodi_id }},{{ $m->dosen_id }},'{{ addslashes($m->deskripsi) }}',{{ $m->sks }})" class="px-3 py-2 bg-cyan-50 text-cyan-600 rounded-lg text-xs hover:bg-cyan-100 transition border border-cyan-100"><i class="fas fa-edit"></i></button>
+                        <form method="POST" action="{{ route('admin-pic.courses.destroy', $m) }}">
+                            @csrf @method('DELETE')
+                            <button type="button" onclick="confirmDelete(this)" class="px-3 py-2 bg-red-50 text-red-600 rounded-lg text-xs hover:bg-red-100 transition border border-red-100"><i class="fas fa-trash"></i></button>
+                        </form>
+                    </div>
+                </td>
             </tr>
         @empty
-            <tr><td colspan="5" class="px-5 py-12 text-center text-gray-400">Tidak ada data</td></tr>
+            <tr><td colspan="5" class="px-5 py-16 text-center text-slate-300"><i class="fas fa-book text-5xl mb-4 block opacity-20"></i><p class="font-bold">Tidak ada data mata kuliah</p></td></tr>
         @endforelse
         </tbody>
     </table></div>
@@ -37,22 +52,22 @@
 
 @push('modals')
 <div id="mk-modal" class="fixed inset-0 z-50 hidden items-center justify-center" style="background:rgba(15,23,42,0.6); backdrop-filter: blur(4px);">
-    <div class="bg-white rounded-3xl shadow-2xl p-8 max-w-lg w-full mx-4 fade-in">
-        <div class="flex items-center justify-between mb-6">
-            <h3 class="text-xl font-bold font-serif text-slate-800" id="mkm-title">Tambah Mata Kuliah</h3>
-            <button type="button" onclick="closeMKModal()" class="w-8 h-8 rounded-full bg-gray-100 hover:bg-gray-200 flex items-center justify-center text-gray-400 hover:text-gray-600 transition"><i class="fas fa-times text-sm"></i></button>
+    <div class="bg-white rounded-[2.5rem] shadow-2xl p-10 max-w-lg w-full mx-4 fade-in">
+        <div class="flex items-center justify-between mb-8">
+            <h3 class="text-2xl font-bold font-serif text-slate-800" id="mkm-title">Tambah Matkul</h3>
+            <button type="button" onclick="closeMKModal()" class="w-10 h-10 rounded-full bg-slate-50 hover:bg-slate-100 flex items-center justify-center text-slate-400 hover:text-slate-600 transition"><i class="fas fa-times text-sm"></i></button>
         </div>
-        <form id="mk-form" method="POST" action="{{ route('admin-pic.courses.store') }}" class="space-y-4" onsubmit="this.querySelector('[data-submit]').disabled=true;this.querySelector('[data-submit]').innerHTML='<i class=\'fas fa-spinner fa-spin text-sm\'></i> Menyimpan...'">@csrf <span id="mk-method"></span>
-            <div><label class="block text-sm font-medium text-gray-600 mb-1">Nama Mata Kuliah <span class="text-red-400">*</span></label><input type="text" name="nama_makul" id="mkf-nama" required class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-cyan-500/20 focus:border-cyan-500 transition"></div>
+        <form id="mk-form" method="POST" action="{{ route('admin-pic.courses.store') }}" class="space-y-5" onsubmit="this.querySelector('[data-submit]').disabled=true;this.querySelector('[data-submit]').innerHTML='<i class=\'fas fa-spinner fa-spin text-sm\'></i> Menyimpan...'">@csrf <span id="mk-method"></span>
+            <div><label class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">Nama Mata Kuliah <span class="text-red-400">*</span></label><input type="text" name="nama_makul" id="mkf-nama" required class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-4 focus:ring-cyan-500/10 focus:border-cyan-500 outline-none transition"></div>
             <div class="grid grid-cols-2 gap-4">
-                <div><label class="block text-sm font-medium text-gray-600 mb-1">Program Studi <span class="text-red-400">*</span></label><select name="prodi_id" id="mkf-prodi" required class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-cyan-500/20 focus:border-cyan-500 transition">@foreach($prodiList as $p)<option value="{{ $p->id }}">{{ $p->nama_prodi }}</option>@endforeach</select></div>
-                <div><label class="block text-sm font-medium text-gray-600 mb-1">Dosen Pengampu <span class="text-red-400">*</span></label><select name="dosen_id" id="mkf-dosen" required class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-cyan-500/20 focus:border-cyan-500 transition">@foreach($dosenList as $d)<option value="{{ $d->id }}">{{ $d->name }}</option>@endforeach</select></div>
+                <div><label class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">Program Studi <span class="text-red-400">*</span></label><select name="prodi_id" id="mkf-prodi" required class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-4 focus:ring-cyan-500/10 focus:border-cyan-500 outline-none transition">@foreach($prodiList as $p)<option value="{{ $p->id }}">{{ $p->nama_prodi }}</option>@endforeach</select></div>
+                <div><label class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">Dosen Pengampu <span class="text-red-400">*</span></label><select name="dosen_id" id="mkf-dosen" required class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-4 focus:ring-cyan-500/10 focus:border-cyan-500 outline-none transition">@foreach($dosenList as $d)<option value="{{ $d->id }}">{{ $d->name }}</option>@endforeach</select></div>
             </div>
-            <div><label class="block text-sm font-medium text-gray-600 mb-1">Deskripsi</label><textarea name="deskripsi" id="mkf-desc" rows="3" class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-cyan-500/20 focus:border-cyan-500 transition"></textarea></div>
-            <div><label class="block text-sm font-medium text-gray-600 mb-1">SKS</label><input type="number" name="sks" id="mkf-sks" value="3" min="1" max="6" class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-cyan-500/20 focus:border-cyan-500 transition"></div>
-            <div class="flex gap-3 pt-2">
-                <button type="button" onclick="closeMKModal()" class="flex-1 py-3 rounded-xl border border-gray-200 text-gray-600 font-medium hover:bg-gray-50 transition">Batal</button>
-                <button type="submit" data-submit class="flex-1 py-3 btn-primary text-white rounded-xl font-semibold transition flex items-center justify-center gap-2"><i class="fas fa-save text-sm"></i> Simpan</button>
+            <div><label class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">Deskripsi</label><textarea name="deskripsi" id="mkf-desc" rows="3" class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-4 focus:ring-cyan-500/10 focus:border-cyan-500 outline-none transition"></textarea></div>
+            <div><label class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">SKS (1-6)</label><input type="number" name="sks" id="mkf-sks" value="3" min="1" max="6" class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-4 focus:ring-cyan-500/10 focus:border-cyan-500 outline-none transition"></div>
+            <div class="flex gap-3 pt-4">
+                <button type="button" onclick="closeMKModal()" class="flex-1 py-3.5 rounded-xl border border-slate-100 text-slate-500 font-bold text-xs hover:bg-slate-50 transition">BATAL</button>
+                <button type="submit" data-submit class="flex-1 py-3.5 bg-cyan-600 text-white hover:bg-cyan-700 rounded-xl font-bold text-xs transition flex items-center justify-center gap-2 shadow-lg shadow-cyan-600/20"><i class="fas fa-save text-sm"></i> SIMPAN</button>
             </div>
         </form>
     </div>

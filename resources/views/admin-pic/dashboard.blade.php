@@ -6,12 +6,12 @@
         <h1 class="text-2xl font-bold text-gray-900 font-serif">Pusat Informasi & Kontrol</h1>
         <p class="text-gray-500 mt-1">Pantau dan verifikasi aktivitas pendaftaran mahasiswa</p>
     </div>
-    <a href="{{ route('admin-pic.verification') }}" class="px-6 py-3 bg-indigo-600 text-white rounded-xl font-bold text-sm hover:bg-indigo-700 transition shadow-lg shadow-indigo-500/20"><i class="fas fa-user-check mr-2"></i>Verifikasi</a>
+    <a href="{{ route('admin-pic.verification') }}" class="px-6 py-3 bg-cyan-600 text-white rounded-xl font-bold text-sm hover:bg-cyan-700 transition shadow-lg shadow-cyan-600/20"><i class="fas fa-user-check mr-2"></i>Verifikasi</a>
 </div>
 
 <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
     <div class="bg-white rounded-3xl p-6 border border-gray-100 card-hover">
-        <div class="w-12 h-12 rounded-2xl bg-indigo-50 flex items-center justify-center text-indigo-600 mb-4 shadow-sm border border-indigo-100"><i class="fas fa-users"></i></div>
+        <div class="w-12 h-12 rounded-2xl bg-cyan-50 flex items-center justify-center text-cyan-600 mb-4 shadow-sm border border-cyan-100"><i class="fas fa-users"></i></div>
         <p class="text-3xl font-bold text-gray-900">{{ $totalMhs }}</p>
         <p class="text-xs text-gray-400 font-semibold uppercase tracking-wider mt-1">Total Mahasiswa</p>
     </div>
@@ -46,13 +46,13 @@
         <h2 class="text-xl font-bold text-gray-900 mb-6 font-serif">Aktivitas Terbaru</h2>
         <div class="space-y-4">
             @forelse($recentPendaftaran as $p)
-                <div class="flex items-center gap-4 p-4 rounded-2xl bg-gray-50 border border-transparent hover:bg-white hover:border-indigo-100 transition duration-300">
-                    <div class="w-10 h-10 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-700 font-bold text-xs shadow-sm">{{ $p->mahasiswa ? $p->mahasiswa->getInitials() : '?' }}</div>
+                <div class="flex items-center gap-4 p-4 rounded-2xl bg-slate-50 border border-transparent hover:bg-white hover:border-cyan-100 transition duration-300">
+                    <div class="w-10 h-10 rounded-full bg-cyan-100 flex items-center justify-center text-cyan-700 font-bold text-xs shadow-sm">{{ $p->mahasiswa ? $p->mahasiswa->getInitials() : '?' }}</div>
                     <div class="flex-1 min-w-0">
-                        <p class="text-sm font-bold text-gray-900 truncate">{{ $p->mahasiswa->name ?? '-' }}</p>
-                        <p class="text-[11px] text-gray-400 mt-0.5 truncate uppercase tracking-wider font-semibold">{{ $p->prodi->nama_prodi ?? '-' }}</p>
+                        <p class="text-sm font-bold text-slate-800 truncate">{{ $p->mahasiswa->name ?? '-' }}</p>
+                        <p class="text-[11px] text-slate-400 mt-0.5 truncate uppercase tracking-wider font-semibold">{{ $p->prodi->nama_prodi ?? '-' }}</p>
                     </div>
-                    <span class="px-2 py-1 rounded-lg text-[9px] font-bold uppercase {{ $p->status === 'diterima' ? 'bg-cyan-50 text-cyan-700' : ($p->status === 'pending' ? 'bg-amber-50 text-amber-700' : 'bg-red-50 text-red-700') }}">{{ $p->status }}</span>
+                    <span class="px-2 py-1 rounded-lg text-[9px] font-bold uppercase {{ $p->status === 'diterima' ? 'bg-emerald-50 text-emerald-700' : ($p->status === 'pending' ? 'bg-amber-50 text-amber-700' : 'bg-red-50 text-red-700') }}">{{ $p->status }}</span>
                 </div>
             @empty
                 <p class="text-gray-400 text-sm text-center py-8">Belum ada pendaftaran</p>
@@ -71,8 +71,8 @@ new Chart(ctx, {
         labels: @json($prodiList->pluck('nama_prodi')),
         datasets: [
             { label: 'Diterima', data: @json($prodiList->map(fn($p) => $p->pendaftaran()->where('status','diterima')->count())), backgroundColor: '#0891B2', borderRadius: 12 },
-            { label: 'Pending', data: @json($prodiList->map(fn($p) => $p->pendaftaran()->where('status','pending')->count())), backgroundColor: '#F59E0B', borderRadius: 12 },
-            { label: 'Ditolak', data: @json($prodiList->map(fn($p) => $p->pendaftaran()->where('status','ditolak')->count())), backgroundColor: '#EF4444', borderRadius: 12 }
+            { label: 'Pending', data: @json($prodiList->map(fn($p) => $p->pendaftaran()->where('status','pending')->count())), backgroundColor: '#f59e0b', borderRadius: 12 },
+            { label: 'Ditolak', data: @json($prodiList->map(fn($p) => $p->pendaftaran()->where('status','ditolak')->count())), backgroundColor: '#ef4444', borderRadius: 12 }
         ]
     },
     options: { 

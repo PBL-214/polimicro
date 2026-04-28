@@ -12,7 +12,7 @@ class CertificateController extends Controller
 {
     public function index()
     {
-        $certs = Sertifikat::with(['mahasiswa', 'prodi'])->latest()->paginate(5);
+        $certs = Sertifikat::with(['mahasiswa', 'prodi'])->latest()->paginate(10);
         $mahasiswaList = User::mahasiswa()->where('status', 'aktif')->get();
         $prodiList = ProdiMikro::aktif()->get();
 

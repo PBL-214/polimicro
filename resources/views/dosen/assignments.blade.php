@@ -24,9 +24,9 @@
                     </div>
                 </div>
                 <div class="flex gap-2">
-                    <a href="{{ route('dosen.submissions', ['tugas' => $t->id]) }}" class="px-4 py-2 bg-cyan-50 text-cyan-600 rounded-lg text-xs hover:bg-cyan-100 font-medium"><i class="fas fa-eye mr-1"></i>Lihat</a>
-                    <button onclick="editTugas({{ $t->id }}, {{ $t->makul_id }}, '{{ addslashes($t->nama_tugas) }}', '{{ addslashes($t->deskripsi_tugas) }}', '{{ $t->tanggal_akhir_deadline?->format('Y-m-d') }}', {{ $t->max_nilai }})" class="px-3 py-2 bg-blue-50 text-blue-600 rounded-lg text-xs hover:bg-blue-100"><i class="fas fa-edit"></i></button>
-                    <form method="POST" action="{{ route('dosen.assignments.destroy', $t) }}" onsubmit="return confirm('Apakah Anda yakin ingin menghapus tugas {{ addslashes($t->nama_tugas) }}?')">@csrf @method('DELETE')<button class="px-3 py-2 bg-red-50 text-red-600 rounded-lg text-xs hover:bg-red-100"><i class="fas fa-trash"></i></button></form>
+                    <a href="{{ route('dosen.submissions', ['tugas' => $t->id]) }}" class="px-4 py-2 bg-cyan-50 text-cyan-600 rounded-lg text-xs hover:bg-cyan-100 font-bold border border-cyan-100 transition inline-flex items-center gap-1"><i class="fas fa-eye text-[10px]"></i> Lihat</a>
+                    <button onclick="editTugas({{ $t->id }}, {{ $t->makul_id }}, '{{ addslashes($t->nama_tugas) }}', '{{ addslashes($t->deskripsi_tugas) }}', '{{ $t->tanggal_akhir_deadline?->format('Y-m-d') }}', {{ $t->max_nilai }})" class="px-3 py-2 bg-cyan-50 text-cyan-600 rounded-lg text-xs hover:bg-cyan-100 border border-cyan-100 transition"><i class="fas fa-edit"></i></button>
+                    <form method="POST" action="{{ route('dosen.assignments.destroy', $t) }}" onsubmit="return confirm('Apakah Anda yakin ingin menghapus tugas {{ addslashes($t->nama_tugas) }}?')">@csrf @method('DELETE')<button class="px-3 py-2 bg-red-50 text-red-600 rounded-lg text-xs hover:bg-red-100 border border-red-100 transition"><i class="fas fa-trash"></i></button></form>
                 </div>
             </div>
             @endforeach

@@ -10,7 +10,7 @@ class CourseController extends Controller
     public function index()
     {
         $user = Auth::user();
-        $myMatkul = $user->matkulDiampu()->with('prodi')->paginate(5);
+        $myMatkul = $user->matkulDiampu()->with('prodi')->paginate(10);
         return view('dosen.courses', compact('myMatkul'));
     }
 }

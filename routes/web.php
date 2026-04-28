@@ -60,6 +60,7 @@ Route::prefix('admin-pic')->middleware(['auth', 'role:admin_pic'])->name('admin-
     Route::get('/verification', [\App\Http\Controllers\AdminPic\VerificationController::class, 'index'])->name('verification');
     Route::put('/verification/{pendaftaran}', [\App\Http\Controllers\AdminPic\VerificationController::class, 'verify'])->name('verification.verify');
     Route::get('/students', [\App\Http\Controllers\AdminPic\StudentController::class, 'index'])->name('students');
+    Route::get('/students/export', [\App\Http\Controllers\AdminPic\StudentController::class, 'exportCsv'])->name('students.export');
     Route::get('/courses', [\App\Http\Controllers\AdminPic\CourseController::class, 'index'])->name('courses');
     Route::post('/courses', [\App\Http\Controllers\AdminPic\CourseController::class, 'store'])->name('courses.store');
     Route::put('/courses/{makul}', [\App\Http\Controllers\AdminPic\CourseController::class, 'update'])->name('courses.update');
@@ -74,6 +75,7 @@ Route::prefix('admin-akademik')->middleware(['auth', 'role:admin_akademik'])->na
     Route::put('/programs/{prodi}', [\App\Http\Controllers\AdminAkademik\ProgramController::class, 'update'])->name('programs.update');
     Route::delete('/programs/{prodi}', [\App\Http\Controllers\AdminAkademik\ProgramController::class, 'destroy'])->name('programs.destroy');
     Route::get('/lecturers', [\App\Http\Controllers\AdminAkademik\LecturerController::class, 'index'])->name('lecturers');
+    Route::get('/lecturers/export', [\App\Http\Controllers\AdminAkademik\LecturerController::class, 'exportCsv'])->name('lecturers.export');
     Route::post('/lecturers', [\App\Http\Controllers\AdminAkademik\LecturerController::class, 'store'])->name('lecturers.store');
     Route::put('/lecturers/{dosen}', [\App\Http\Controllers\AdminAkademik\LecturerController::class, 'update'])->name('lecturers.update');
     Route::delete('/lecturers/{dosen}', [\App\Http\Controllers\AdminAkademik\LecturerController::class, 'destroy'])->name('lecturers.destroy');

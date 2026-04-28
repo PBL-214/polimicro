@@ -14,9 +14,26 @@
     <style>
         .empty-state-card { background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%); border: 2px dashed #e2e8f0; }
         .empty-state-icon { background: white; box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05); }
+        
+        /* Global Progress Bar */
+        #top-progress { position: fixed; top: 0; left: 0; height: 3px; background: linear-gradient(to right, #06b6d4, #3b82f6); z-index: 9999; width: 0; transition: width 0.4s ease, opacity 0.4s ease; }
+
+        /* Table Actions */
+        .row-actions { opacity: 1; transform: none; pointer-events: auto; }
+        
+        .custom-scrollbar::-webkit-scrollbar { width: 4px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 10px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.2); }
+
+        /* Mobile Optimization: Prevent iOS Auto-Zoom on Focus */
+        @media screen and (max-width: 768px) {
+            input, select, textarea { font-size: 16px !important; }
+        }
     </style>
 </head>
 <body class="bg-slate-50 text-slate-700">
+    <div id="top-progress"></div>
     @php
         $user = auth()->user();
         $role = $user->role;
@@ -25,61 +42,91 @@
 
         $menus = [
             'mahasiswa' => [
-                ['label' => 'Dashboard', 'icon' => 'fas fa-th-large', 'route' => 'mahasiswa.dashboard', 'id' => 'dashboard'],
-                ['label' => 'Mata Kuliah Saya', 'icon' => 'fas fa-book-open', 'route' => 'mahasiswa.courses', 'id' => 'courses'],
-                ['label' => 'Materi', 'icon' => 'fas fa-file-alt', 'route' => 'mahasiswa.materials', 'id' => 'materials'],
-                ['label' => 'Tugas', 'icon' => 'fas fa-tasks', 'route' => 'mahasiswa.assignments', 'id' => 'assignments'],
-                ['label' => 'Nilai', 'icon' => 'fas fa-chart-bar', 'route' => 'mahasiswa.grades', 'id' => 'grades'],
-                ['label' => 'Sertifikat', 'icon' => 'fas fa-certificate', 'route' => 'mahasiswa.certificates', 'id' => 'certificates'],
-                ['label' => 'Profil', 'icon' => 'fas fa-user-cog', 'route' => 'mahasiswa.profile', 'id' => 'profile'],
+                'MAIN' => [
+                    ['label' => 'Dashboard', 'icon' => 'fas fa-th-large', 'route' => 'mahasiswa.dashboard', 'id' => 'dashboard'],
+                ],
+                'LEARNING' => [
+                    ['label' => 'Mata Kuliah Saya', 'icon' => 'fas fa-book-open', 'route' => 'mahasiswa.courses', 'id' => 'courses'],
+                    ['label' => 'Materi', 'icon' => 'fas fa-file-alt', 'route' => 'mahasiswa.materials', 'id' => 'materials'],
+                    ['label' => 'Tugas', 'icon' => 'fas fa-tasks', 'route' => 'mahasiswa.assignments', 'id' => 'assignments'],
+                ],
+                'RESULTS' => [
+                    ['label' => 'Nilai', 'icon' => 'fas fa-chart-bar', 'route' => 'mahasiswa.grades', 'id' => 'grades'],
+                    ['label' => 'Sertifikat', 'icon' => 'fas fa-certificate', 'route' => 'mahasiswa.certificates', 'id' => 'certificates'],
+                ],
+                'ACCOUNT' => [
+                    ['label' => 'Profil', 'icon' => 'fas fa-user-cog', 'route' => 'mahasiswa.profile', 'id' => 'profile'],
+                ]
             ],
             'dosen' => [
-                ['label' => 'Dashboard', 'icon' => 'fas fa-th-large', 'route' => 'dosen.dashboard', 'id' => 'dashboard'],
-                ['label' => 'Matkul Saya', 'icon' => 'fas fa-book-open', 'route' => 'dosen.courses', 'id' => 'courses'],
-                ['label' => 'Materi', 'icon' => 'fas fa-file-alt', 'route' => 'dosen.materials', 'id' => 'materials'],
-                ['label' => 'Penugasan', 'icon' => 'fas fa-clipboard-list', 'route' => 'dosen.assignments', 'id' => 'assignments'],
-                ['label' => 'Pengumpulan', 'icon' => 'fas fa-inbox', 'route' => 'dosen.submissions', 'id' => 'submissions'],
-                ['label' => 'Mahasiswa', 'icon' => 'fas fa-users', 'route' => 'dosen.students', 'id' => 'students'],
+                'MAIN' => [
+                    ['label' => 'Dashboard', 'icon' => 'fas fa-th-large', 'route' => 'dosen.dashboard', 'id' => 'dashboard'],
+                ],
+                'MANAGEMENT' => [
+                    ['label' => 'Matkul Saya', 'icon' => 'fas fa-book-open', 'route' => 'dosen.courses', 'id' => 'courses'],
+                    ['label' => 'Materi', 'icon' => 'fas fa-file-alt', 'route' => 'dosen.materials', 'id' => 'materials'],
+                    ['label' => 'Penugasan', 'icon' => 'fas fa-clipboard-list', 'route' => 'dosen.assignments', 'id' => 'assignments'],
+                ],
+                'ACTIVITY' => [
+                    ['label' => 'Pengumpulan', 'icon' => 'fas fa-inbox', 'route' => 'dosen.submissions', 'id' => 'submissions'],
+                    ['label' => 'Mahasiswa', 'icon' => 'fas fa-users', 'route' => 'dosen.students', 'id' => 'students'],
+                ]
             ],
             'admin_pic' => [
-                ['label' => 'Dashboard', 'icon' => 'fas fa-th-large', 'route' => 'admin-pic.dashboard', 'id' => 'dashboard'],
-                ['label' => 'Verifikasi', 'icon' => 'fas fa-user-check', 'route' => 'admin-pic.verification', 'id' => 'verification'],
-                ['label' => 'Mata Kuliah', 'icon' => 'fas fa-book', 'route' => 'admin-pic.courses', 'id' => 'courses'],
-                ['label' => 'Data Pelajar', 'icon' => 'fas fa-user-graduate', 'route' => 'admin-pic.students', 'id' => 'students'],
+                'MAIN' => [
+                    ['label' => 'Dashboard', 'icon' => 'fas fa-th-large', 'route' => 'admin-pic.dashboard', 'id' => 'dashboard'],
+                ],
+                'OPERATIONAL' => [
+                    ['label' => 'Verifikasi', 'icon' => 'fas fa-user-check', 'route' => 'admin-pic.verification', 'id' => 'verification'],
+                ],
+                'DATA' => [
+                    ['label' => 'Mata Kuliah', 'icon' => 'fas fa-book', 'route' => 'admin-pic.courses', 'id' => 'courses'],
+                    ['label' => 'Data Pelajar', 'icon' => 'fas fa-user-graduate', 'route' => 'admin-pic.students', 'id' => 'students'],
+                ]
             ],
             'admin_akademik' => [
-                ['label' => 'Dashboard', 'icon' => 'fas fa-th-large', 'route' => 'admin-akademik.dashboard', 'id' => 'dashboard'],
-                ['label' => 'Data Dosen', 'icon' => 'fas fa-chalkboard-teacher', 'route' => 'admin-akademik.lecturers', 'id' => 'lecturers'],
-                ['label' => 'Program Studi', 'icon' => 'fas fa-university', 'route' => 'admin-akademik.programs', 'id' => 'programs'],
-                ['label' => 'Sertifikat', 'icon' => 'fas fa-certificate', 'route' => 'admin-akademik.certificates', 'id' => 'certificates'],
+                'MAIN' => [
+                    ['label' => 'Dashboard', 'icon' => 'fas fa-th-large', 'route' => 'admin-akademik.dashboard', 'id' => 'dashboard'],
+                ],
+                'MANAGEMENT' => [
+                    ['label' => 'Data Dosen', 'icon' => 'fas fa-chalkboard-teacher', 'route' => 'admin-akademik.lecturers', 'id' => 'lecturers'],
+                    ['label' => 'Program Studi', 'icon' => 'fas fa-university', 'route' => 'admin-akademik.programs', 'id' => 'programs'],
+                ],
+                'RECORDS' => [
+                    ['label' => 'Sertifikat', 'icon' => 'fas fa-certificate', 'route' => 'admin-akademik.certificates', 'id' => 'certificates'],
+                ]
             ],
         ];
-        $items = $menus[$role] ?? [];
+        $itemsByGroup = $menus[$role] ?? [];
     @endphp
 
     {{-- Sidebar --}}
-    <aside id="sidebar" class="fixed left-0 top-0 h-full w-64 z-40 flex flex-col transition-transform duration-300 lg:translate-x-0 -translate-x-full" style="background: var(--slate-900);">
+    <aside id="sidebar" class="fixed left-0 top-0 h-full w-64 z-40 flex flex-col transition-transform duration-300 lg:translate-x-0 -translate-x-full shadow-2xl lg:shadow-none bg-slate-800">
         <div class="p-6 border-b border-white/10">
             <a href="{{ route('programs') }}" class="flex items-center gap-3">
-                <div class="w-10 h-10 rounded-xl bg-cyan-600 backdrop-blur flex items-center justify-center"><i class="fas fa-graduation-cap text-lg text-white"></i></div>
-                <span class="text-xl font-bold font-serif text-white">Polimicro</span>
+                <div class="w-10 h-10 rounded-xl bg-cyan-500 backdrop-blur flex items-center justify-center shadow-lg shadow-cyan-500/20"><i class="fas fa-graduation-cap text-lg text-white"></i></div>
+                <span class="text-xl font-bold font-serif text-white tracking-tight">Polimicro</span>
             </a>
         </div>
-        <div class="p-4 mx-4 mt-4 rounded-2xl bg-white/10 backdrop-blur border border-white/5">
+        <div class="p-4 mx-4 mt-4 rounded-2xl bg-white/5 border border-white/5">
             <div class="flex items-center gap-3">
-                <div class="w-10 h-10 rounded-full bg-white/15 flex items-center justify-center font-bold text-sm text-white">{{ $initials }}</div>
+                <div class="w-10 h-10 rounded-full bg-cyan-500/20 border border-cyan-500/30 flex items-center justify-center font-bold text-sm text-cyan-300 shadow-inner">{{ $initials }}</div>
                 <div class="overflow-hidden">
-                    <p class="font-semibold text-sm truncate text-white">{{ $user->name }}</p>
-                    <p class="text-xs text-white/60">{{ $user->getRoleLabel() }}</p>
+                    <p class="font-bold text-sm truncate text-white tracking-wide">{{ $user->name }}</p>
+                    <p class="text-[10px] font-bold uppercase tracking-widest text-cyan-400/80">{{ $user->getRoleLabel() }}</p>
                 </div>
             </div>
         </div>
-        <nav class="flex-1 p-4 space-y-1 overflow-y-auto">
-            <p class="text-xs text-white/40 font-semibold uppercase tracking-wider px-4 mb-2">Menu</p>
-            @foreach($items as $item)
-                <a href="{{ route($item['route']) }}" class="flex items-center gap-3 px-4 py-3 text-sm font-medium rounded-xl transition-all {{ $activePage === $item['id'] ? 'bg-white/15 text-white shadow-lg shadow-black/10' : 'text-white/70 hover:text-white hover:bg-white/[0.08]' }}" @if($activePage === $item['id']) style="backdrop-filter:blur(8px)" @endif>
-                    <i class="{{ $item['icon'] }} w-5 text-center"></i>{{ $item['label'] }}
-                </a>
+        <nav class="flex-1 p-4 space-y-6 overflow-y-auto custom-scrollbar">
+            @foreach($itemsByGroup as $group => $items)
+                <div class="space-y-1">
+                    <p class="text-[10px] text-white/30 font-bold uppercase tracking-[0.2em] px-4 mb-2">{{ $group }}</p>
+                    @foreach($items as $item)
+                        <a href="{{ route($item['route']) }}" onclick="startProgress()" class="flex items-center gap-3 px-4 py-2.5 text-sm font-medium rounded-xl transition-all duration-200 {{ $activePage === $item['id'] ? 'bg-cyan-500 text-white shadow-lg shadow-cyan-500/20' : 'text-slate-400 hover:text-white hover:bg-white/[0.05]' }}">
+                            <i class="{{ $item['icon'] }} w-5 text-center text-xs opacity-80"></i>{{ $item['label'] }}
+                        </a>
+                    @endforeach
+                </div>
             @endforeach
         </nav>
         
@@ -93,7 +140,7 @@
             </div>
         </div>
 
-        <div class="p-4 border-t border-white/10">
+        <div class="p-4 border-t border-white/10 mb-20 lg:mb-0">
             <a href="{{ route('programs') }}" class="flex items-center gap-3 px-4 py-3 text-sm text-white/60 hover:text-white rounded-xl hover:bg-white/[0.08] transition"><i class="fas fa-compass w-5 text-center"></i>Jelajahi Program</a>
             <form method="POST" action="{{ route('logout') }}">
                 @csrf
@@ -157,7 +204,7 @@
                             @endif
                         </div>
                     </div>
-                    <div class="w-9 h-9 rounded-full flex items-center justify-center text-white text-sm font-bold shadow-lg shadow-green-500/20" style="background:linear-gradient(135deg,#1B5E20,#4CAF50)">{{ $initials }}</div>
+                    <div class="w-9 h-9 rounded-full flex items-center justify-center text-white text-sm font-bold shadow-lg shadow-cyan-500/20" style="background:linear-gradient(135deg,#1e293b,#06b6d4)">{{ $initials }}</div>
                 </div>
             </div>
         </header>
@@ -189,28 +236,113 @@
     </div>
 
     {{-- Bottom Navigation for Mobile --}}
-    <div class="bottom-nav lg:hidden">
-        <a href="{{ route($user->getDashboardRoute()) }}" class="bottom-nav-item {{ $activePage === 'dashboard' ? 'active' : '' }}">
-            <i class="fas fa-th-large"></i>
-            <span>Dasbor</span>
-        </a>
-        <a href="{{ $role === 'mahasiswa' ? route('mahasiswa.courses') : '#' }}" class="bottom-nav-item {{ $activePage === 'courses' ? 'active' : '' }}">
-            <i class="fas fa-book-open"></i>
-            <span>Kursus</span>
-        </a>
-        <a href="{{ $role === 'mahasiswa' ? route('mahasiswa.assignments') : '#' }}" class="bottom-nav-item {{ $activePage === 'assignments' ? 'active' : '' }}">
-            <i class="fas fa-tasks"></i>
-            <span>Tugas</span>
-        </a>
-        <a href="{{ $role === 'mahasiswa' ? route('mahasiswa.profile') : '#' }}" class="bottom-nav-item {{ $activePage === 'profile' ? 'active' : '' }}">
-            <i class="fas fa-user-circle"></i>
-            <span>Profil</span>
-        </a>
+    @php
+        $bottomNav = [
+            'mahasiswa' => [
+                ['label' => 'Dasbor', 'icon' => 'fas fa-th-large', 'route' => 'mahasiswa.dashboard', 'id' => 'dashboard'],
+                ['label' => 'Kursus', 'icon' => 'fas fa-book-open', 'route' => 'mahasiswa.courses', 'id' => 'courses'],
+                ['label' => 'Tugas', 'icon' => 'fas fa-tasks', 'route' => 'mahasiswa.assignments', 'id' => 'assignments'],
+                ['label' => 'Profil', 'icon' => 'fas fa-user-circle', 'route' => 'mahasiswa.profile', 'id' => 'profile'],
+            ],
+            'dosen' => [
+                ['label' => 'Dasbor', 'icon' => 'fas fa-th-large', 'route' => 'dosen.dashboard', 'id' => 'dashboard'],
+                ['label' => 'Matkul', 'icon' => 'fas fa-book-open', 'route' => 'dosen.courses', 'id' => 'courses'],
+                ['label' => 'Materi', 'icon' => 'fas fa-file-alt', 'route' => 'dosen.materials', 'id' => 'materials'],
+                ['label' => 'Kumpul', 'icon' => 'fas fa-inbox', 'route' => 'dosen.submissions', 'id' => 'submissions'],
+            ],
+            'admin_pic' => [
+                ['label' => 'Dasbor', 'icon' => 'fas fa-th-large', 'route' => 'admin-pic.dashboard', 'id' => 'dashboard'],
+                ['label' => 'Matkul', 'icon' => 'fas fa-book', 'route' => 'admin-pic.courses', 'id' => 'courses'],
+                ['label' => 'Verif', 'icon' => 'fas fa-user-check', 'route' => 'admin-pic.verification', 'id' => 'verification'],
+                ['label' => 'Siswa', 'icon' => 'fas fa-users', 'route' => 'admin-pic.students', 'id' => 'students'],
+            ],
+            'admin_akademik' => [
+                ['label' => 'Dasbor', 'icon' => 'fas fa-th-large', 'route' => 'admin-akademik.dashboard', 'id' => 'dashboard'],
+                ['label' => 'Prodi', 'icon' => 'fas fa-university', 'route' => 'admin-akademik.programs', 'id' => 'programs'],
+                ['label' => 'Dosen', 'icon' => 'fas fa-chalkboard-teacher', 'route' => 'admin-akademik.lecturers', 'id' => 'lecturers'],
+                ['label' => 'Sertif', 'icon' => 'fas fa-certificate', 'route' => 'admin-akademik.certificates', 'id' => 'certificates'],
+            ],
+        ];
+        $currentBottomNav = $bottomNav[$role] ?? [];
+    @endphp
+    <div class="bottom-nav lg:hidden border-t border-slate-100 bg-white/80 backdrop-blur-lg">
+        @foreach($currentBottomNav as $item)
+            <a href="{{ route($item['route']) }}" class="bottom-nav-item {{ $activePage === $item['id'] ? 'text-cyan-600' : 'text-slate-400' }}">
+                <i class="{{ $item['icon'] }}"></i>
+                <span class="text-[10px] font-bold uppercase tracking-tighter">{{ $item['label'] }}</span>
+            </a>
+        @endforeach
     </div>
 
     @stack('modals')
+
+    {{-- Global Delete Confirmation Modal --}}
+    <div id="delete-modal" class="fixed inset-0 z-[100] hidden items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm">
+        <div class="bg-white rounded-[2.5rem] shadow-2xl max-w-sm w-full p-8 scale-in">
+            <div class="w-20 h-20 bg-red-50 rounded-3xl flex items-center justify-center mx-auto mb-6 text-red-500 shadow-inner">
+                <i class="fas fa-trash-alt text-3xl"></i>
+            </div>
+            <h3 class="text-xl font-bold text-slate-900 text-center mb-2 font-serif">Hapus Data?</h3>
+            <p class="text-slate-500 text-sm text-center mb-8 leading-relaxed">Tindakan ini tidak dapat dibatalkan. Semua data terkait akan ikut terhapus secara permanen.</p>
+            <div class="flex gap-3">
+                <button onclick="closeDeleteModal()" class="flex-1 py-3.5 rounded-2xl bg-slate-50 text-slate-600 font-bold text-sm hover:bg-slate-100 transition">Batal</button>
+                <button id="confirm-delete-btn" class="flex-1 py-3.5 rounded-2xl bg-red-500 text-white font-bold text-sm hover:bg-red-600 transition shadow-lg shadow-red-500/20">Ya, Hapus</button>
+            </div>
+        </div>
+    </div>
+
     @stack('scripts')
     <script>
+        let formToSubmit = null;
+        function confirmDelete(button) {
+            formToSubmit = button.closest('form');
+            document.getElementById('delete-modal').classList.remove('hidden');
+            document.getElementById('delete-modal').classList.add('flex');
+        }
+        function closeDeleteModal() {
+            document.getElementById('delete-modal').classList.add('hidden');
+            document.getElementById('delete-modal').classList.remove('flex');
+            formToSubmit = null;
+        }
+        document.getElementById('confirm-delete-btn').addEventListener('click', () => {
+            if (formToSubmit) {
+                const btn = document.getElementById('confirm-delete-btn');
+                btn.disabled = true;
+                btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Menghapus...';
+                formToSubmit.submit();
+            }
+        });
+
+        function startProgress() {
+            const bar = document.getElementById('top-progress');
+            bar.style.width = '0%';
+            bar.style.opacity = '1';
+            
+            let w = 0;
+            const interval = setInterval(() => {
+                if (w < 90) {
+                    w += Math.random() * 5;
+                    bar.style.width = w + '%';
+                }
+            }, 200);
+
+            window.addEventListener('load', () => {
+                clearInterval(interval);
+                bar.style.width = '100%';
+                setTimeout(() => {
+                    bar.style.opacity = '0';
+                    setTimeout(() => bar.style.width = '0%', 400);
+                }, 500);
+            });
+        }
+
+        // Handle browser back/forward
+        window.addEventListener('pageshow', (event) => {
+            const bar = document.getElementById('top-progress');
+            bar.style.opacity = '0';
+            bar.style.width = '0%';
+        });
+
         function toggleSidebar() {
             const sidebar = document.getElementById('sidebar');
             const backdrop = document.getElementById('sidebar-backdrop');
