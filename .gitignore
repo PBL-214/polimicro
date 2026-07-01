@@ -18,7 +18,6 @@
 /public/hot
 /public/storage
 /public/design-assets/img/
-/storage/framework/views/*
 /storage/*.key
 /storage/pail
 /vendor

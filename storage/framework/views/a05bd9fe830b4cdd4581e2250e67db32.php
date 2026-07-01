@@ -1,0 +1,108 @@
+<?php $__env->startSection('title', 'Kelola Sertifikat - Admin Akademik - Polimicro'); ?>
+<?php $__env->startSection('content'); ?>
+<div class="flex items-center justify-between mb-6">
+    <div><h1 class="text-2xl font-bold text-gray-900">Kelola Sertifikat</h1><p class="text-gray-500">Terbitkan dan kelola sertifikat kelulusan</p></div>
+    <button onclick="openCertModal()" class="px-5 py-3 btn-primary text-white rounded-xl font-semibold text-sm"><i class="fas fa-plus mr-2"></i>Terbitkan Sertifikat</button>
+</div>
+<div class="flex flex-wrap gap-4 mb-6">
+    <div class="relative flex-1 min-w-[300px]">
+        <i class="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"></i>
+        <input type="text" id="certSearch" placeholder="Cari nomor atau nama mahasiswa..." class="w-full pl-11 pr-4 py-3 rounded-xl border border-slate-200 bg-white text-sm focus:ring-4 focus:ring-cyan-500/10 focus:border-cyan-500 outline-none transition-all">
+    </div>
+</div>
+
+<div class="bg-white rounded-2xl border border-slate-100 overflow-hidden shadow-sm">
+    <div class="overflow-x-auto"><table class="w-full text-sm">
+        <thead><tr class="bg-slate-50/80 border-b border-slate-100"><th class="px-5 py-3 text-left font-bold text-slate-600 uppercase tracking-wider text-[10px]">No. Sertifikat</th><th class="px-5 py-3 text-left font-bold text-slate-600 uppercase tracking-wider text-[10px]">Mahasiswa</th><th class="px-5 py-3 text-left font-bold text-slate-600 uppercase tracking-wider text-[10px]">Program Studi</th><th class="px-5 py-3 text-left font-bold text-slate-600 uppercase tracking-wider text-[10px]">Berkas</th><th class="px-5 py-3 text-center font-bold text-slate-600 uppercase tracking-wider text-[10px]">Status</th><th class="px-5 py-3 text-center font-bold text-slate-600 uppercase tracking-wider text-[10px]">Aksi</th></tr></thead>
+        <tbody class="divide-y divide-slate-50" id="certTableBody">
+        <?php $__empty_1 = true; $__currentLoopData = $certs; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $c): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
+            <tr class="hover:bg-slate-50/80 transition cert-row group" data-info="<?php echo e(strtolower($c->nomor_sertifikat . ' ' . ($c->mahasiswa->name ?? ''))); ?>">
+                <td class="px-5 py-4 font-mono text-xs font-bold text-cyan-600"><?php echo e($c->nomor_sertifikat); ?></td>
+                <td class="px-5 py-4"><div class="flex items-center gap-3"><div class="w-8 h-8 rounded-full bg-cyan-100 flex items-center justify-center text-[10px] font-bold text-cyan-700 transition-transform group-hover:scale-110 shadow-sm border border-white"><?php echo e($c->mahasiswa ? $c->mahasiswa->getInitials() : '?'); ?></div><span class="font-bold text-slate-800"><?php echo e($c->mahasiswa->name ?? '-'); ?></span></div></td>
+                <td class="px-5 py-4 text-slate-500 text-xs font-medium"><?php echo e($c->prodi->nama_prodi ?? '-'); ?></td>
+                <td class="px-5 py-4">
+                    <p class="text-slate-400 text-[10px] mb-1 font-bold"><?php echo e($c->tanggal_terbit->format('d M Y')); ?></p>
+                    <?php if($c->file_sertifikat): ?>
+                        <a href="<?php echo e(asset('storage/' . $c->file_sertifikat)); ?>" target="_blank" class="text-cyan-600 hover:text-cyan-700 font-bold text-[10px] inline-flex items-center gap-1 transition-colors"><i class="fas fa-external-link-alt"></i> UNDUH PDF</a>
+                    <?php else: ?>
+                        <span class="text-xs text-slate-300">-</span>
+                    <?php endif; ?>
+                </td>
+                <td class="px-5 py-4 text-center"><span class="px-2.5 py-0.5 rounded-lg text-[10px] font-bold uppercase bg-cyan-50 text-cyan-700 border border-cyan-100"><?php echo e($c->status); ?></span></td>
+                <td class="px-5 py-4 text-center">
+                    <div class="row-actions flex gap-2 justify-center">
+                        <form method="POST" action="<?php echo e(route('admin-akademik.certificates.destroy', $c)); ?>">
+                            <?php echo csrf_field(); ?> <?php echo method_field('DELETE'); ?>
+                            <button type="button" onclick="confirmDelete(this)" class="px-3 py-2 bg-red-50 text-red-600 rounded-lg text-xs hover:bg-red-100 transition border border-red-100"><i class="fas fa-trash"></i></button>
+                        </form>
+                    </div>
+                </td>
+            </tr>
+        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
+            <tr><td colspan="6" class="px-5 py-16 text-center text-slate-400"><i class="fas fa-certificate text-5xl mb-4 block opacity-20"></i><p class="font-bold">Belum ada sertifikat diterbitkan</p></td></tr>
+        <?php endif; ?>
+        </tbody>
+    </table></div>
+</div>
+
+<div class="mt-6">
+    <?php echo e($certs->links()); ?>
+
+</div>
+
+<?php $__env->startPush('modals'); ?>
+<div id="cert-modal" class="fixed inset-0 z-50 hidden items-center justify-center" style="background:rgba(15,23,42,0.6); backdrop-filter: blur(4px);">
+    <div class="bg-white rounded-[2.5rem] shadow-2xl p-10 max-w-lg w-full mx-4 fade-in">
+        <div class="flex items-center justify-between mb-8">
+            <h3 class="text-2xl font-bold font-serif text-slate-800">Terbitkan Sertifikat</h3>
+            <button type="button" onclick="closeCertModal()" class="w-10 h-10 rounded-full bg-slate-50 hover:bg-slate-100 flex items-center justify-center text-slate-400 hover:text-slate-600 transition"><i class="fas fa-times text-sm"></i></button>
+        </div>
+        <form method="POST" action="<?php echo e(route('admin-akademik.certificates.store')); ?>" enctype="multipart/form-data" class="space-y-5" onsubmit="this.querySelector('[data-submit]').disabled=true;this.querySelector('[data-submit]').innerHTML='<i class=\'fas fa-spinner fa-spin text-sm\'></i> Menerbitkan...'"><?php echo csrf_field(); ?>
+            <div><label class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">Mahasiswa <span class="text-red-400">*</span></label><select name="mahasiswa_id" required class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-4 focus:ring-cyan-500/10 focus:border-cyan-500 outline-none transition"><?php $__currentLoopData = $mahasiswaList; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $m): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?><option value="<?php echo e($m->id); ?>"><?php echo e($m->name); ?> (<?php echo e($m->nim); ?>)</option><?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?></select></div>
+            <div><label class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">Program Studi <span class="text-red-400">*</span></label><select name="prodi_id" required class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-4 focus:ring-cyan-500/10 focus:border-cyan-500 outline-none transition"><?php $__currentLoopData = $prodiList; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $p): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?><option value="<?php echo e($p->id); ?>"><?php echo e($p->nama_prodi); ?></option><?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?></select></div>
+            <div class="grid grid-cols-2 gap-4">
+                <div><label class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">No. Sertifikat <span class="text-red-400">*</span></label><input type="text" name="nomor_sertifikat" value="CERT-PM-<?php echo e(date('Y')); ?>-<?php echo e(str_pad($certs->count()+1, 3, '0', STR_PAD_LEFT)); ?>" required class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-4 focus:ring-cyan-500/10 focus:border-cyan-500 outline-none transition"></div>
+                <div><label class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">Tgl Terbit <span class="text-red-400">*</span></label><input type="date" name="tanggal_terbit" value="<?php echo e(date('Y-m-d')); ?>" required class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-4 focus:ring-cyan-500/10 focus:border-cyan-500 outline-none transition"></div>
+            </div>
+            <div>
+                <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">Berkas Sertifikat (PDF/JPG, Max: 2MB) <span class="text-red-400">*</span></label>
+                <div class="relative group">
+                    <input type="file" name="file_sertifikat" required accept=".pdf,.jpg,.jpeg,.png" class="w-full px-4 py-3 rounded-xl border border-slate-200 text-sm file:mr-4 file:py-1 file:px-3 file:rounded-lg file:border-0 file:text-[10px] file:font-bold file:bg-cyan-50 file:text-cyan-700 hover:file:bg-cyan-100 transition cursor-pointer">
+                </div>
+            </div>
+            <div class="flex gap-3 pt-4">
+                <button type="button" onclick="closeCertModal()" class="flex-1 py-3.5 rounded-xl border border-slate-100 text-slate-500 font-bold text-xs hover:bg-slate-50 transition">BATAL</button>
+                <button type="submit" data-submit class="flex-1 py-3.5 bg-cyan-600 text-white hover:bg-cyan-700 rounded-xl font-bold text-xs transition flex items-center justify-center gap-2 shadow-lg shadow-cyan-600/20"><i class="fas fa-certificate"></i> TERBITKAN</button>
+            </div>
+        </form>
+    </div>
+</div>
+<?php $__env->stopPush(); ?>
+<?php $__env->startPush('scripts'); ?>
+<script>
+// Search
+const searchInput = document.getElementById('certSearch');
+const tableRows = document.querySelectorAll('.cert-row');
+
+searchInput.addEventListener('input', () => {
+    const q = searchInput.value.toLowerCase();
+    tableRows.forEach(row => {
+        if (row.dataset.info.includes(q)) {
+            row.style.display = '';
+            row.classList.add('fade-in');
+        } else {
+            row.style.display = 'none';
+        }
+    });
+});
+
+function openCertModal() { document.getElementById('cert-modal').classList.remove('hidden'); document.getElementById('cert-modal').classList.add('flex'); }
+function closeCertModal() { document.getElementById('cert-modal').classList.add('hidden'); document.getElementById('cert-modal').classList.remove('flex'); }
+document.getElementById('cert-modal').addEventListener('click', function(e) { if (e.target === this) closeCertModal(); });
+document.addEventListener('keydown', function(e) { if (e.key === 'Escape') closeCertModal(); });
+</script>
+<?php $__env->stopPush(); ?>
+<?php $__env->stopSection(); ?>
+
+
+<?php echo $__env->make('layouts.dashboard', ['activePage' => 'certificates'], array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH C:\laragon\www\polimicro\resources\views/admin-akademik/certificates.blade.php ENDPATH**/ ?>
