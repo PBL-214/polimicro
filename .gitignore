@@ -29,3 +29,6 @@ qa_testing_report*.md
 release_audit_report.md
 system_diagrams.md
 tests/Feature/PolimicroUserJourneyTest.php
+/storage/framework/views/*.php
+/storage/framework/sessions/*
+/storage/logs/*.log

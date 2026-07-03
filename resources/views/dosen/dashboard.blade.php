@@ -7,8 +7,8 @@
         <p class="text-gray-500 mt-1">Kelola pembelajaran dan pantau progres mahasiswa Anda</p>
     </div>
     <div class="hidden sm:flex gap-2">
-        <button class="px-4 py-2 bg-cyan-50 text-cyan-700 rounded-xl text-xs font-bold border border-cyan-100 hover:bg-cyan-100 transition"><i class="fas fa-plus mr-2"></i>Materi Baru</button>
-        <button class="px-4 py-2 bg-slate-800 text-white rounded-xl text-xs font-bold hover:bg-slate-900 transition shadow-lg shadow-slate-800/20"><i class="fas fa-clipboard-list mr-2"></i>Buka Penugasan</button>
+        <a href="{{ route('dosen.courses') }}" class="px-4 py-2 bg-cyan-50 text-cyan-700 rounded-xl text-xs font-bold border border-cyan-100 hover:bg-cyan-100 transition flex items-center justify-center gap-2"><i class="fas fa-plus text-xs"></i> Materi Baru</a>
+        <a href="{{ route('dosen.courses') }}" class="px-4 py-2 bg-slate-800 text-white rounded-xl text-xs font-bold hover:bg-slate-900 transition shadow-lg shadow-slate-800/20 flex items-center justify-center gap-2"><i class="fas fa-clipboard-list text-xs"></i> Buka Penugasan</a>
     </div>
 </div>
 
@@ -44,14 +44,14 @@
         </div>
         <div class="space-y-4">
             @forelse($myMatkul as $m)
-                <div class="group flex items-center gap-4 p-4 rounded-2xl bg-slate-50 border border-transparent hover:border-cyan-200 hover:bg-white transition-all duration-300">
+                <a href="{{ route('dosen.courses.show', $m->id) }}" class="group flex items-center gap-4 p-4 rounded-2xl bg-slate-50 border border-transparent hover:border-cyan-200 hover:bg-white transition-all duration-300">
                     <div class="w-12 h-12 rounded-2xl bg-cyan-600 flex items-center justify-center text-white shadow-lg shadow-cyan-600/20 group-hover:scale-110 transition duration-300"><i class="fas fa-book"></i></div>
                     <div class="flex-1">
                         <p class="font-bold text-slate-800">{{ $m->nama_makul }}</p>
                         <p class="text-xs text-slate-400">{{ $m->prodi->nama_prodi ?? 'Prodi' }} • {{ $m->sks }} SKS</p>
                     </div>
                     <i class="fas fa-chevron-right text-slate-300 group-hover:text-cyan-500 transition"></i>
-                </div>
+                </a>
             @empty
                 <div class="text-center py-8"><p class="text-gray-400 text-sm">Belum ada mata kuliah yang diampu</p></div>
             @endforelse

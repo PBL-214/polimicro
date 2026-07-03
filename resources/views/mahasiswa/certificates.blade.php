@@ -16,11 +16,10 @@
                     <div class="flex justify-between"><span class="text-slate-500">Nomor</span><span class="font-medium font-mono text-xs text-slate-700">{{ $c->nomor_sertifikat }}</span></div>
                     <div class="flex justify-between"><span class="text-slate-500">Tanggal Terbit</span><span class="font-medium text-slate-700">{{ $c->tanggal_terbit->format('d/m/Y') }}</span></div>
                     <div class="flex justify-between"><span class="text-slate-500">Status</span><span class="px-3 py-1 rounded-full text-xs font-semibold bg-cyan-50 text-cyan-700">{{ ucfirst($c->status) }}</span></div>
-                </div>
                 @if($c->file_sertifikat)
-                    <a href="{{ asset('storage/' . $c->file_sertifikat) }}" target="_blank" class="block w-full py-3 text-center bg-cyan-600 hover:bg-cyan-700 text-white rounded-xl font-semibold transition"><i class="fas fa-download mr-2"></i>Unduh Sertifikat</a>
+                    <a href="{{ asset('storage/' . $c->file_sertifikat) }}" target="_blank" class="block w-full py-3 text-center bg-cyan-600 hover:bg-cyan-700 text-white rounded-xl font-semibold transition"><i class="fas fa-download mr-2"></i>Unduh Sertifikat PDF</a>
                 @else
-                    <button disabled class="w-full py-3 bg-slate-100 text-slate-400 rounded-xl font-semibold cursor-not-allowed"><i class="fas fa-clock mr-2"></i>File Belum Tersedia</button>
+                    <a href="{{ route('mahasiswa.certificates.print', $c->id) }}" target="_blank" class="block w-full py-3 text-center bg-teal-600 hover:bg-teal-700 text-white rounded-xl font-semibold transition"><i class="fas fa-print mr-2"></i>Lihat Sertifikat Digital</a>
                 @endif
             </div>
         </div>

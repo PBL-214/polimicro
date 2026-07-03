@@ -15,12 +15,11 @@ class AssignmentController extends Controller
 {
     public function index(Request $request)
     {
-        $user = Auth::user();
-        $enrolled = $user->getEnrolledMatkul();
-        $submissions = $user->submissions;
         $filterMatkul = $request->query('matkul');
-
-        return view('mahasiswa.assignments', compact('enrolled', 'submissions', 'filterMatkul'));
+        if ($filterMatkul) {
+            return redirect()->route('mahasiswa.courses.show', $filterMatkul);
+        }
+        return redirect()->route('mahasiswa.courses');
     }
 
     public function submit(Request $request)

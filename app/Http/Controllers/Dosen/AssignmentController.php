@@ -10,23 +10,35 @@ use Symfony\Component\HttpFoundation\Response;
 
 class AssignmentController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $user = Auth::user();
-        $myMatkul = $user->matkulDiampu;
-        return view('dosen.assignments', compact('myMatkul'));
+        $filterMatkul = $request->query('matkul');
+        if ($filterMatkul) {
+            return redirect()->route('dosen.courses.show', $filterMatkul);
+        }
+        return redirect()->route('dosen.courses');
     }
 
     public function store(Request $request)
     {
         $request->validate([
             'makul_id' => 'required|exists:makul,id',
+            'materi_id' => 'nullable|exists:materi,id',
             'nama_tugas' => 'required|string|max:100',
             'deskripsi_tugas' => 'required|string|max:5000',
             'tanggal_akhir_deadline' => 'required|date|after_or_equal:today',
             'max_nilai' => 'required|integer|min:1|max:100',
             'file_tugas' => 'nullable|file|max:2048',
         ]);
+
+        if ($request->filled('materi_id')) {
+            $materiExists = \App\Models\Materi::where('id', $request->materi_id)
+                ->where('makul_id', $request->makul_id)
+                ->exists();
+            if (!$materiExists) {
+                return back()->withErrors(['materi_id' => 'Materi yang dipilih tidak valid untuk mata kuliah ini.'])->withInput();
+            }
+        }
 
         // Validate file extension manually
         if ($request->hasFile('file_tugas')) {
@@ -59,6 +71,7 @@ class AssignmentController extends Controller
             'file_tugas' => $filePath,
             'tanggal_akhir_deadline' => $request->tanggal_akhir_deadline,
             'max_nilai' => $request->max_nilai,
+            'materi_id' => $request->materi_id,
             'makul_id' => $request->makul_id,
         ]);
 
@@ -69,12 +82,22 @@ class AssignmentController extends Controller
     {
         $request->validate([
             'makul_id' => 'required|exists:makul,id',
+            'materi_id' => 'nullable|exists:materi,id',
             'nama_tugas' => 'required|string|max:100',
             'deskripsi_tugas' => 'required|string|max:5000',
             'tanggal_akhir_deadline' => 'required|date',
             'max_nilai' => 'required|integer|min:1|max:100',
             'file_tugas' => 'nullable|file|max:2048',
         ]);
+
+        if ($request->filled('materi_id')) {
+            $materiExists = \App\Models\Materi::where('id', $request->materi_id)
+                ->where('makul_id', $request->makul_id)
+                ->exists();
+            if (!$materiExists) {
+                return back()->withErrors(['materi_id' => 'Materi yang dipilih tidak valid untuk mata kuliah ini.'])->withInput();
+            }
+        }
 
         // S1: Verify ownership
         $user = Auth::user();
@@ -95,6 +118,7 @@ class AssignmentController extends Controller
 
         $tugas->update([
             'makul_id' => $request->makul_id,
+            'materi_id' => $request->materi_id,
             'nama_tugas' => $request->nama_tugas,
             'deskripsi_tugas' => $request->deskripsi_tugas,
             'tanggal_akhir_deadline' => $request->tanggal_akhir_deadline,

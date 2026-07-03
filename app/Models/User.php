@@ -96,6 +96,57 @@ class User extends Authenticatable
         $prodiIds = $this->enrolledProdi()->pluck('prodi_id');
         return Makul::whereIn('prodi_id', $prodiIds)->with(['prodi', 'dosen'])->get();
     }
+    public function getMaxActiveDate()
+    {
+        $maxDate = null;
+        $enrolled = $this->enrolledProdi()->with('prodi')->get();
+        foreach ($enrolled as $pendaftaran) {
+            $prodi = $pendaftaran->prodi;
+            if (!$prodi) continue;
+            
+            $registeredAt = \Carbon\Carbon::parse($pendaftaran->registered_at);
+            
+            // Parse "6 Bulan", "1 Tahun"
+            $durasiStr = strtolower(trim($prodi->durasi));
+            preg_match('/(\d+)\s*(bulan|tahun|minggu|hari)/i', $durasiStr, $matches);
+            
+            $date = clone $registeredAt;
+            if (count($matches) === 3) {
+                $amount = (int) $matches[1];
+                $unit = strtolower($matches[2]);
+                if ($unit === 'bulan') $date->addMonths($amount);
+                elseif ($unit === 'tahun') $date->addYears($amount);
+                elseif ($unit === 'minggu') $date->addWeeks($amount);
+                elseif ($unit === 'hari') $date->addDays($amount);
+            }
+            
+            if ($maxDate === null || $date > $maxDate) {
+                $maxDate = $date;
+            }
+        }
+        return $maxDate;
+    }
+
+    public function checkProdiCompletion($prodi_id)
+    {
+        // Get all Makul for this prodi
+        $makulIds = \App\Models\Makul::where('prodi_id', $prodi_id)->pluck('id');
+        if ($makulIds->isEmpty()) return false;
+
+        // Get all Tugas for these Makul
+        $allTugasCount = \App\Models\Tugas::whereIn('makul_id', $makulIds)->count();
+        if ($allTugasCount === 0) return false;
+
+        // Get count of submitted and graded Tugas for this user
+        $gradedTugasCount = $this->submissions()
+            ->whereHas('tugas', function ($query) use ($makulIds) {
+                $query->whereIn('makul_id', $makulIds);
+            })
+            ->whereNotNull('nilai')
+            ->count();
+
+        return $gradedTugasCount >= $allTugasCount;
+    }
 
     // ---- SCOPES ----
     public function scopeMahasiswa($query) { return $query->where('role', 'mahasiswa'); }

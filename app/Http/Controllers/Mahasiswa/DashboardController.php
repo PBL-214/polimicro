@@ -44,6 +44,21 @@ class DashboardController extends Controller
         $graded = $submissions->whereNotNull('nilai');
         $avgGrade = $graded->count() > 0 ? round($graded->avg('nilai')) : 0;
 
-        return view('mahasiswa.dashboard', compact('user', 'enrolled', 'submissions', 'certs', 'upcoming', 'avgGrade', 'overallProgress'));
+        $maxActiveDate = $user->getMaxActiveDate();
+        
+        // Prepare events for calendar
+        $calendarEvents = [];
+        foreach ($upcoming as $t) {
+            if ($t->tanggal_akhir_deadline) {
+                $calendarEvents[] = [
+                    'title' => $t->nama_tugas,
+                    'start' => \Carbon\Carbon::parse($t->tanggal_akhir_deadline)->format('Y-m-d'),
+                    'url' => route('mahasiswa.courses.show', $t->makul_id)
+                ];
+            }
+        }
+        $calendarEventsJson = json_encode($calendarEvents);
+
+        return view('mahasiswa.dashboard', compact('user', 'enrolled', 'submissions', 'certs', 'upcoming', 'avgGrade', 'overallProgress', 'maxActiveDate', 'calendarEventsJson'));
     }
 }

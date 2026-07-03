@@ -46,7 +46,39 @@ class SubmissionController extends Controller
             'feedback' => $request->feedback,
         ]);
 
-        // Notify Mahasiswa
+        // Auto-generate certificate if prodi is completed
+        $prodi_id = $submission->tugas->makul->prodi_id ?? null;
+        if ($prodi_id && $submission->mahasiswa) {
+            $isComplete = $submission->mahasiswa->checkProdiCompletion($prodi_id);
+            if ($isComplete) {
+                // Check if already has a certificate
+                $existingCert = \App\Models\Sertifikat::where('mahasiswa_id', $submission->mahasiswa_id)
+                    ->where('prodi_id', $prodi_id)->first();
+                
+                if (!$existingCert) {
+                    \App\Models\Sertifikat::create([
+                        'mahasiswa_id' => $submission->mahasiswa_id,
+                        'prodi_id' => $prodi_id,
+                        'nomor_sertifikat' => 'CERT-PM-' . date('Y') . '-' . strtoupper(uniqid()),
+                        'tanggal_terbit' => now(),
+                        'status' => 'diterbitkan',
+                        'file_sertifikat' => null, // Dynamic HTML
+                    ]);
+                    
+                    // Notify student about certificate
+                    $submission->mahasiswa->notify(new GeneralNotification([
+                        'title' => 'Sertifikat Kelulusan! 🎓',
+                        'message' => 'Selamat! Anda telah menyelesaikan semua tugas dan mendapatkan Sertifikat Kelulusan.',
+                        'icon' => 'fas fa-certificate',
+                        'color' => 'bg-green-100',
+                        'text_color' => 'text-green-600',
+                        'url' => route('mahasiswa.certificates')
+                    ]));
+                }
+            }
+        }
+
+        // Notify Mahasiswa about grading
         if ($submission->mahasiswa) {
             $submission->mahasiswa->notify(new GeneralNotification([
                 'title' => 'Tugas Telah Dinilai',

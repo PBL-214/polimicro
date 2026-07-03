@@ -25,13 +25,16 @@ Route::post('/programs/enroll', [ProgramController::class, 'enroll'])->name('pro
 
 // ---- MAHASISWA ROUTES ----
 Route::prefix('mahasiswa')->middleware(['auth', 'role:mahasiswa'])->name('mahasiswa.')->group(function () {
+    Route::get('/expired', fn() => view('mahasiswa.expired'))->name('expired');
     Route::get('/dashboard', [\App\Http\Controllers\Mahasiswa\DashboardController::class, 'index'])->name('dashboard');
     Route::get('/courses', [\App\Http\Controllers\Mahasiswa\CourseController::class, 'index'])->name('courses');
+    Route::get('/courses/{course}', [\App\Http\Controllers\Mahasiswa\CourseController::class, 'show'])->name('courses.show');
     Route::get('/materials', [\App\Http\Controllers\Mahasiswa\MaterialController::class, 'index'])->name('materials');
     Route::get('/assignments', [\App\Http\Controllers\Mahasiswa\AssignmentController::class, 'index'])->name('assignments');
     Route::post('/assignments/submit', [\App\Http\Controllers\Mahasiswa\AssignmentController::class, 'submit'])->name('assignments.submit');
     Route::get('/grades', [\App\Http\Controllers\Mahasiswa\GradeController::class, 'index'])->name('grades');
     Route::get('/certificates', [\App\Http\Controllers\Mahasiswa\CertificateController::class, 'index'])->name('certificates');
+    Route::get('/certificates/{id}/print', [\App\Http\Controllers\Mahasiswa\CertificateController::class, 'print'])->name('certificates.print');
     Route::get('/profile', [\App\Http\Controllers\Mahasiswa\ProfileController::class, 'index'])->name('profile');
     Route::put('/profile', [\App\Http\Controllers\Mahasiswa\ProfileController::class, 'update'])->name('profile.update');
     Route::put('/profile/password', [\App\Http\Controllers\Mahasiswa\ProfileController::class, 'changePassword'])->name('profile.password');
@@ -41,6 +44,7 @@ Route::prefix('mahasiswa')->middleware(['auth', 'role:mahasiswa'])->name('mahasi
 Route::prefix('dosen')->middleware(['auth', 'role:dosen'])->name('dosen.')->group(function () {
     Route::get('/dashboard', [\App\Http\Controllers\Dosen\DashboardController::class, 'index'])->name('dashboard');
     Route::get('/courses', [\App\Http\Controllers\Dosen\CourseController::class, 'index'])->name('courses');
+    Route::get('/courses/{course}', [\App\Http\Controllers\Dosen\CourseController::class, 'show'])->name('courses.show');
     Route::get('/materials', [\App\Http\Controllers\Dosen\MaterialController::class, 'index'])->name('materials');
     Route::post('/materials', [\App\Http\Controllers\Dosen\MaterialController::class, 'store'])->name('materials.store');
     Route::put('/materials/{materi}', [\App\Http\Controllers\Dosen\MaterialController::class, 'update'])->name('materials.update');

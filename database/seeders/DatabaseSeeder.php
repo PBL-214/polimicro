@@ -63,22 +63,22 @@ class DatabaseSeeder extends Seeder
         $mk8 = Makul::create(['kode_makul'=>'MK008','nama_makul'=>'Ethical Hacking','deskripsi'=>'Penetration testing dan ethical hacking','sks'=>3,'prodi_id'=>$prodi3->id,'dosen_id'=>$dsn3->id]);
 
         // ====== MATERI ======
-        Materi::create(['kode_materi'=>'MAT001','nama_materi'=>'Pengantar Machine Learning','deskripsi_materi'=>'Konsep dasar ML, tipe-tipe learning, dan pipeline ML','file_materi'=>'pengantar-ml.pdf','makul_id'=>$mk1->id]);
-        Materi::create(['kode_materi'=>'MAT002','nama_materi'=>'Supervised Learning','deskripsi_materi'=>'Regresi, klasifikasi, decision tree, SVM','file_materi'=>'supervised-learning.pdf','makul_id'=>$mk1->id]);
-        Materi::create(['kode_materi'=>'MAT003','nama_materi'=>'Neural Networks Basics','deskripsi_materi'=>'Arsitektur neural network, backpropagation','file_materi'=>'neural-networks.pdf','makul_id'=>$mk2->id]);
-        Materi::create(['kode_materi'=>'MAT004','nama_materi'=>'Convolutional Neural Networks','deskripsi_materi'=>'CNN untuk image recognition dan computer vision','file_materi'=>'cnn.pdf','makul_id'=>$mk2->id]);
-        Materi::create(['kode_materi'=>'MAT005','nama_materi'=>'Pengantar Statistik','deskripsi_materi'=>'Statistik deskriptif, distribusi, dan uji hipotesis','file_materi'=>'pengantar-statistik.pdf','makul_id'=>$mk4->id]);
-        Materi::create(['kode_materi'=>'MAT006','nama_materi'=>'Dashboard Design','deskripsi_materi'=>'Prinsip desain dashboard yang efektif','file_materi'=>'dashboard-design.pdf','makul_id'=>$mk5->id]);
-        Materi::create(['kode_materi'=>'MAT007','nama_materi'=>'Firewall & IDS','deskripsi_materi'=>'Konfigurasi firewall dan intrusion detection system','file_materi'=>'firewall-ids.pdf','makul_id'=>$mk7->id]);
-        Materi::create(['kode_materi'=>'MAT008','nama_materi'=>'Vulnerability Assessment','deskripsi_materi'=>'Teknik penilaian kerentanan sistem','file_materi'=>'vuln-assessment.pdf','makul_id'=>$mk8->id]);
+        $mat1 = Materi::create(['kode_materi'=>'MAT001','nama_materi'=>'Pengantar Machine Learning','deskripsi_materi'=>'Konsep dasar ML, tipe-tipe learning, dan pipeline ML','file_materi'=>'pengantar-ml.pdf','youtube_link'=>'https://www.youtube.com/watch?v=HcqpanDadyQ','makul_id'=>$mk1->id]);
+        $mat2 = Materi::create(['kode_materi'=>'MAT002','nama_materi'=>'Supervised Learning','deskripsi_materi'=>'Regresi, klasifikasi, decision tree, SVM','file_materi'=>'supervised-learning.pdf','makul_id'=>$mk1->id]);
+        $mat3 = Materi::create(['kode_materi'=>'MAT003','nama_materi'=>'Neural Networks Basics','deskripsi_materi'=>'Arsitektur neural network, backpropagation','file_materi'=>'neural-networks.pdf','youtube_link'=>'https://www.youtube.com/watch?v=aircAruvnKk','makul_id'=>$mk2->id]);
+        $mat4 = Materi::create(['kode_materi'=>'MAT004','nama_materi'=>'Convolutional Neural Networks','deskripsi_materi'=>'CNN untuk image recognition dan computer vision','file_materi'=>'cnn.pdf','youtube_link'=>'https://www.youtube.com/watch?v=YRhxdVk_sIs','makul_id'=>$mk2->id]);
+        $mat5 = Materi::create(['kode_materi'=>'MAT005','nama_materi'=>'Pengantar Statistik','deskripsi_materi'=>'Statistik deskriptif, distribusi, dan uji hipotesis','file_materi'=>'pengantar-statistik.pdf','makul_id'=>$mk4->id]);
+        $mat6 = Materi::create(['kode_materi'=>'MAT006','nama_materi'=>'Dashboard Design','deskripsi_materi'=>'Prinsip desain dashboard yang efektif','file_materi'=>'dashboard-design.pdf','makul_id'=>$mk5->id]);
+        $mat7 = Materi::create(['kode_materi'=>'MAT007','nama_materi'=>'Firewall & IDS','deskripsi_materi'=>'Konfigurasi firewall dan intrusion detection system','file_materi'=>'firewall-ids.pdf','makul_id'=>$mk7->id]);
+        $mat8 = Materi::create(['kode_materi'=>'MAT008','nama_materi'=>'Vulnerability Assessment','deskripsi_materi'=>'Teknik penilaian kerentanan sistem','file_materi'=>'vuln-assessment.pdf','makul_id'=>$mk8->id]);
 
         // ====== TUGAS ======
-        $tgs1 = Tugas::create(['kode_tugas'=>'TGS001','nama_tugas'=>'Implementasi Linear Regression','deskripsi_tugas'=>'Buat model regresi linier menggunakan dataset yang diberikan','max_nilai'=>100,'tanggal_akhir_deadline'=>now()->addDays(14),'makul_id'=>$mk1->id]);
-        $tgs2 = Tugas::create(['kode_tugas'=>'TGS002','nama_tugas'=>'Klasifikasi Gambar dengan CNN','deskripsi_tugas'=>'Bangun classifier gambar menggunakan CNN','max_nilai'=>100,'tanggal_akhir_deadline'=>now()->addDays(21),'makul_id'=>$mk2->id]);
+        $tgs1 = Tugas::create(['kode_tugas'=>'TGS001','nama_tugas'=>'Implementasi Linear Regression','deskripsi_tugas'=>'Buat model regresi linier menggunakan dataset yang diberikan','max_nilai'=>100,'tanggal_akhir_deadline'=>now()->addDays(14),'materi_id'=>$mat2->id,'makul_id'=>$mk1->id]);
+        $tgs2 = Tugas::create(['kode_tugas'=>'TGS002','nama_tugas'=>'Klasifikasi Gambar dengan CNN','deskripsi_tugas'=>'Bangun classifier gambar menggunakan CNN','max_nilai'=>100,'tanggal_akhir_deadline'=>now()->addDays(21),'materi_id'=>$mat4->id,'makul_id'=>$mk2->id]);
         $tgs3 = Tugas::create(['kode_tugas'=>'TGS003','nama_tugas'=>'Chatbot Sederhana','deskripsi_tugas'=>'Buat chatbot sederhana menggunakan NLP','max_nilai'=>100,'tanggal_akhir_deadline'=>now()->addDays(28),'makul_id'=>$mk3->id]);
-        $tgs4 = Tugas::create(['kode_tugas'=>'TGS004','nama_tugas'=>'Analisis Statistik Dataset','deskripsi_tugas'=>'Lakukan analisis statistik pada dataset terlampir','max_nilai'=>100,'tanggal_akhir_deadline'=>now()->addDays(10),'makul_id'=>$mk4->id]);
+        $tgs4 = Tugas::create(['kode_tugas'=>'TGS004','nama_tugas'=>'Analisis Statistik Dataset','deskripsi_tugas'=>'Lakukan analisis statistik pada dataset terlampir','max_nilai'=>100,'tanggal_akhir_deadline'=>now()->addDays(10),'materi_id'=>$mat5->id,'makul_id'=>$mk4->id]);
         $tgs5 = Tugas::create(['kode_tugas'=>'TGS005','nama_tugas'=>'Dashboard Interaktif','deskripsi_tugas'=>'Buat dashboard interaktif menggunakan tools visualisasi','max_nilai'=>100,'tanggal_akhir_deadline'=>now()->addDays(17),'makul_id'=>$mk5->id]);
-        $tgs6 = Tugas::create(['kode_tugas'=>'TGS006','nama_tugas'=>'Network Security Audit','deskripsi_tugas'=>'Lakukan audit keamanan pada jaringan yang diberikan','max_nilai'=>100,'tanggal_akhir_deadline'=>now()->addDays(14),'makul_id'=>$mk7->id]);
+        $tgs6 = Tugas::create(['kode_tugas'=>'TGS006','nama_tugas'=>'Network Security Audit','deskripsi_tugas'=>'Lakukan audit keamanan pada jaringan yang diberikan','max_nilai'=>100,'tanggal_akhir_deadline'=>now()->addDays(14),'materi_id'=>$mat7->id,'makul_id'=>$mk7->id]);
         $tgs7 = Tugas::create(['kode_tugas'=>'TGS007','nama_tugas'=>'Penetration Testing Report','deskripsi_tugas'=>'Buat laporan penetration testing lengkap','max_nilai'=>100,'tanggal_akhir_deadline'=>now()->addDays(21),'makul_id'=>$mk8->id]);
 
         // ====== PENDAFTARAN ======

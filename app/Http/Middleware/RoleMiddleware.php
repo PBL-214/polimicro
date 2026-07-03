@@ -22,6 +22,15 @@ class RoleMiddleware
             return redirect()->route(auth()->user()->getDashboardRoute());
         }
 
+        if (auth()->user()->isMahasiswa()) {
+            $maxActiveDate = auth()->user()->getMaxActiveDate();
+            if ($maxActiveDate && now()->startOfDay()->greaterThan($maxActiveDate->endOfDay())) {
+                if ($request->route()->getName() !== 'mahasiswa.expired' && $request->route()->getName() !== 'logout') {
+                    return redirect()->route('mahasiswa.expired');
+                }
+            }
+        }
+
         return $next($request);
     }
 }

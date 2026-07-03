@@ -10,10 +10,10 @@ class MaterialController extends Controller
 {
     public function index(Request $request)
     {
-        $user = Auth::user();
-        $enrolled = $user->getEnrolledMatkul();
         $filterMatkul = $request->query('matkul');
-
-        return view('mahasiswa.materials', compact('enrolled', 'filterMatkul'));
+        if ($filterMatkul) {
+            return redirect()->route('mahasiswa.courses.show', $filterMatkul);
+        }
+        return redirect()->route('mahasiswa.courses');
     }
 }

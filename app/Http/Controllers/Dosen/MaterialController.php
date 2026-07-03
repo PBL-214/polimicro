@@ -12,10 +12,11 @@ class MaterialController extends Controller
 {
     public function index(Request $request)
     {
-        $user = Auth::user();
-        $myMatkul = $user->matkulDiampu;
         $filterMatkul = $request->query('matkul');
-        return view('dosen.materials', compact('myMatkul', 'filterMatkul'));
+        if ($filterMatkul) {
+            return redirect()->route('dosen.courses.show', $filterMatkul);
+        }
+        return redirect()->route('dosen.courses');
     }
 
     public function store(Request $request)
@@ -25,6 +26,7 @@ class MaterialController extends Controller
             'nama_materi' => 'required|string|max:100',
             'deskripsi_materi' => 'required|string|max:5000',
             'file_materi' => 'nullable|file|max:2048',
+            'youtube_link' => 'nullable|url|max:255',
         ]);
 
         // Validate file extension manually (avoids fileinfo dependency)
@@ -56,6 +58,7 @@ class MaterialController extends Controller
             'nama_materi' => $request->nama_materi,
             'deskripsi_materi' => $request->deskripsi_materi,
             'file_materi' => $filePath,
+            'youtube_link' => $request->youtube_link,
             'makul_id' => $request->makul_id,
         ]);
 
@@ -69,6 +72,7 @@ class MaterialController extends Controller
             'nama_materi' => 'required|string|max:100',
             'deskripsi_materi' => 'required|string|max:5000',
             'file_materi' => 'nullable|file|max:2048',
+            'youtube_link' => 'nullable|url|max:255',
         ]);
 
         // S1: Verify ownership
@@ -100,6 +104,7 @@ class MaterialController extends Controller
             'nama_materi' => $request->nama_materi,
             'deskripsi_materi' => $request->deskripsi_materi,
             'file_materi' => $filePath,
+            'youtube_link' => $request->youtube_link,
         ]);
         return back()->with('success', 'Materi berhasil diperbarui!');
     }
