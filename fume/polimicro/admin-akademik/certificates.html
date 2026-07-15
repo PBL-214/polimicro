@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kelola Sertifikat - Admin Akademik - Polimicro</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="../assets/css/custom.css">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-50" style="background:#faf8f5">
+  <div id="app"></div>
+  <div id="cert-modal" class="fixed inset-0 z-50 hidden items-center justify-center modal-overlay">
+    <div class="bg-white rounded-3xl shadow-2xl p-8 max-w-lg w-full mx-4 fade-in">
+      <h3 class="text-xl font-bold mb-4" id="cm-title">Terbitkan Sertifikat</h3>
+      <form id="cert-form" class="space-y-4">
+        <input type="hidden" id="cf-id">
+        <div><label class="block text-sm font-medium text-gray-600 mb-1">Mahasiswa</label><select id="cf-mhs" required class="w-full px-4 py-3 rounded-xl border border-gray-200"></select></div>
+        <div><label class="block text-sm font-medium text-gray-600 mb-1">Program Studi</label><select id="cf-prodi" required class="w-full px-4 py-3 rounded-xl border border-gray-200"></select></div>
+        <div class="grid grid-cols-2 gap-4">
+          <div><label class="block text-sm font-medium text-gray-600 mb-1">Nomor Sertifikat</label><input type="text" id="cf-nomor" required class="w-full px-4 py-3 rounded-xl border border-gray-200"></div>
+          <div><label class="block text-sm font-medium text-gray-600 mb-1">Tanggal Terbit</label><input type="date" id="cf-tanggal" required class="w-full px-4 py-3 rounded-xl border border-gray-200"></div>
+        </div>
+        <div class="flex gap-3">
+          <button type="button" onclick="closeModal()" class="flex-1 py-3 rounded-xl border border-gray-200 text-gray-600 font-medium">Batal</button>
+          <button type="submit" class="flex-1 py-3 btn-primary text-white rounded-xl font-semibold">Terbitkan</button>
+        </div>
+      </form>
+    </div>
+  </div>
+  <script src="../assets/js/data.js"></script><script src="../assets/js/auth.js"></script><script src="../assets/js/utils.js"></script><script src="../assets/js/sidebar.js"></script>
+  <script>
+    if (!Auth.requireAuth(['admin_akademik'])) throw '';
+
+    function render() {
+      document.getElementById('app').innerHTML = buildSidebar('admin_akademik', 'certificates') + `
+      <main class="p-6 lg:p-8 fade-in">
+        <div class="flex items-center justify-between mb-6">
+          <div><h1 class="text-2xl font-bold text-gray-900">Kelola Sertifikat</h1><p class="text-gray-500">Terbitkan dan kelola sertifikat kelulusan</p></div>
+          <button onclick="openAdd()" class="px-5 py-3 btn-primary text-white rounded-xl font-semibold text-sm"><i class="fas fa-plus mr-2"></i>Terbitkan Sertifikat</button>
+        </div>
+        <div class="bg-white rounded-2xl border border-gray-100 overflow-hidden">
+          <div class="overflow-x-auto"><table class="w-full text-sm">
+            <thead><tr class="bg-gray-50" style="background:#faf8f5"><th class="px-5 py-3 text-left font-semibold text-gray-600">No. Sertifikat</th><th class="px-5 py-3 text-left font-semibold text-gray-600">Mahasiswa</th><th class="px-5 py-3 text-left font-semibold text-gray-600">Program Studi</th><th class="px-5 py-3 text-left font-semibold text-gray-600">Tanggal Terbit</th><th class="px-5 py-3 text-center font-semibold text-gray-600">Status</th><th class="px-5 py-3 text-center font-semibold text-gray-600">Aksi</th></tr></thead>
+            <tbody class="divide-y divide-gray-50">
+              ${PoliData.sertifikat.map(c => {
+                const mhs = PoliData.getUserById(c.mahasiswa_id);
+                const prodi = PoliData.getProdiById(c.prodi_id);
+                return `<tr class="hover:bg-gray-50">
+                  <td class="px-5 py-4 font-mono text-xs font-medium">${c.nomor_sertifikat}</td>
+                  <td class="px-5 py-4"><div class="flex items-center gap-2"><div class="w-7 h-7 rounded-full bg-green-100 flex items-center justify-center text-xs font-bold text-green-700">${mhs ? Utils.getInitials(mhs.nama) : '?'}</div><span class="font-medium text-sm">${mhs ? mhs.nama : '-'}</span></div></td>
+                  <td class="px-5 py-4 text-gray-500">${prodi ? prodi.nama : '-'}</td>
+                  <td class="px-5 py-4 text-gray-400 text-xs">${Utils.formatDate(c.tanggal_terbit)}</td>
+                  <td class="px-5 py-4 text-center">${Utils.statusBadge(c.status)}</td>
+                  <td class="px-5 py-4 text-center"><button onclick="deleteCert(${c.id})" class="px-3 py-2 bg-red-50 text-red-600 rounded-lg text-xs hover:bg-red-100"><i class="fas fa-trash"></i></button></td>
+                </tr>`;
+              }).join('')}
+              ${PoliData.sertifikat.length === 0 ? '<tr><td colspan="6" class="px-5 py-12 text-center text-gray-400">Belum ada sertifikat diterbitkan</td></tr>' : ''}
+            </tbody>
+          </table></div>
+        </div>
+      </main>` + closeSidebarLayout();
+    }
+
+    function openAdd() {
+      document.getElementById('cm-title').textContent = 'Terbitkan Sertifikat Baru';
+      document.getElementById('cf-id').value = '';
+      document.getElementById('cf-nomor').value = 'CERT-PM-' + new Date().getFullYear() + '-' + String(PoliData.sertifikat.length + 1).padStart(3, '0');
+      document.getElementById('cf-tanggal').value = new Date().toISOString().split('T')[0];
+      document.getElementById('cf-mhs').innerHTML = PoliData.getMahasiswaList().filter(m => m.status === 'aktif').map(m => `<option value="${m.id}">${m.nama} (${m.nim})</option>`).join('');
+      document.getElementById('cf-prodi').innerHTML = PoliData.getActiveProdi().map(p => `<option value="${p.id}">${p.nama}</option>`).join('');
+      showModal();
+    }
+    function showModal() { document.getElementById('cert-modal').classList.remove('hidden'); document.getElementById('cert-modal').classList.add('flex'); }
+    function closeModal() { document.getElementById('cert-modal').classList.add('hidden'); document.getElementById('cert-modal').classList.remove('flex'); }
+    function deleteCert(id) { if (!confirm('Hapus sertifikat ini?')) return; PoliData.sertifikat = PoliData.sertifikat.filter(c => c.id !== id); saveData(); render(); Utils.showToast('Sertifikat dihapus'); }
+
+    document.getElementById('cert-form').addEventListener('submit', e => {
+      e.preventDefault();
+      PoliData.sertifikat.push({
+        id: Utils.generateId(PoliData.sertifikat),
+        mahasiswa_id: parseInt(document.getElementById('cf-mhs').value),
+        prodi_id: parseInt(document.getElementById('cf-prodi').value),
+        nomor_sertifikat: document.getElementById('cf-nomor').value,
+        tanggal_terbit: document.getElementById('cf-tanggal').value,
+        status: 'diterbitkan'
+      });
+      saveData(); closeModal(); render(); Utils.showToast('Sertifikat berhasil diterbitkan!');
+    });
+    render();
+  </script>
+</body>
+</html>

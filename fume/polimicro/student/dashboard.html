@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard Mahasiswa - Polimicro</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="../assets/css/custom.css">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-50" style="background:#faf8f5">
+  <div id="app"></div>
+  <script src="../assets/js/data.js"></script><script src="../assets/js/auth.js"></script><script src="../assets/js/utils.js"></script><script src="../assets/js/sidebar.js"></script>
+  <script>
+    if (!Auth.requireAuth(['mahasiswa'])) throw '';
+    const user = Auth.getCurrentUser();
+    const enrolled = PoliData.getEnrolledMatkul(user.id);
+    const mySubmissions = PoliData.getSubmissionsByMahasiswa(user.id);
+    const myPendaftaran = PoliData.getPendaftaranByMahasiswa(user.id).filter(p => p.status === 'diterima');
+    const certs = PoliData.getSertifikatByMahasiswa(user.id);
+
+    // Upcoming deadlines
+    const upcoming = [];
+    enrolled.forEach(m => {
+      PoliData.getTugasByMatkul(m.id).forEach(t => {
+        const sub = mySubmissions.find(s => s.tugas_id === t.id);
+        if (!sub) upcoming.push({...t, matkul: m.nama});
+      });
+    });
+
+    // Avg grade
+    const graded = mySubmissions.filter(s => s.nilai !== null);
+    const avgGrade = graded.length ? Math.round(graded.reduce((a,s) => a + s.nilai, 0) / graded.length) : 0;
+
+    document.getElementById('app').innerHTML = buildSidebar('mahasiswa', 'dashboard') + `
+    <main class="p-6 lg:p-8 fade-in">
+      <div class="mb-8">
+        <h1 class="text-2xl font-bold text-gray-900">Selamat Datang, ${user.nama.split(' ')[0]}! 👋</h1>
+        <p class="text-gray-500 mt-1">Berikut ringkasan aktivitas pembelajaran Anda</p>
+      </div>
+
+      <!-- Stats -->
+      <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+        <div class="bg-white rounded-2xl p-5 border border-gray-100 card-hover">
+          <div class="flex items-center justify-between mb-3"><div class="w-10 h-10 rounded-xl bg-green-100 flex items-center justify-center"><i class="fas fa-book-open text-green-600"></i></div><span class="text-xs text-green-600 font-medium"><i class="fas fa-arrow-up mr-1"></i>Aktif</span></div>
+          <p class="text-2xl font-bold text-gray-900">${enrolled.length}</p><p class="text-xs text-gray-400 mt-1">Mata Kuliah</p>
+        </div>
+        <div class="bg-white rounded-2xl p-5 border border-gray-100 card-hover">
+          <div class="flex items-center justify-between mb-3"><div class="w-10 h-10 rounded-xl bg-blue-100 flex items-center justify-center"><i class="fas fa-tasks text-blue-600"></i></div></div>
+          <p class="text-2xl font-bold text-gray-900">${mySubmissions.length}</p><p class="text-xs text-gray-400 mt-1">Tugas Dikumpul</p>
+        </div>
+        <div class="bg-white rounded-2xl p-5 border border-gray-100 card-hover">
+          <div class="flex items-center justify-between mb-3"><div class="w-10 h-10 rounded-xl bg-amber-100 flex items-center justify-center"><i class="fas fa-star text-amber-600"></i></div></div>
+          <p class="text-2xl font-bold text-gray-900">${avgGrade}</p><p class="text-xs text-gray-400 mt-1">Rata-rata Nilai</p>
+        </div>
+        <div class="bg-white rounded-2xl p-5 border border-gray-100 card-hover">
+          <div class="flex items-center justify-between mb-3"><div class="w-10 h-10 rounded-xl bg-purple-100 flex items-center justify-center"><i class="fas fa-certificate text-purple-600"></i></div></div>
+          <p class="text-2xl font-bold text-gray-900">${certs.length}</p><p class="text-xs text-gray-400 mt-1">Sertifikat</p>
+        </div>
+      </div>
+
+      <div class="grid lg:grid-cols-3 gap-6">
+        <!-- Enrolled Courses -->
+        <div class="lg:col-span-2 bg-white rounded-2xl border border-gray-100 p-6">
+          <div class="flex items-center justify-between mb-4"><h2 class="font-bold text-gray-900">Mata Kuliah Aktif</h2><a href="my-courses.html" class="text-sm text-green-600 font-medium hover:underline">Lihat Semua</a></div>
+          <div class="space-y-3">
+            ${enrolled.slice(0, 4).map(m => {
+              const prodi = PoliData.getProdiById(m.prodi_id);
+              const dosen = PoliData.getUserById(m.dosen_id);
+              return `<div class="flex items-center gap-4 p-4 rounded-xl bg-gray-50 hover:bg-green-50 transition cursor-pointer" onclick="window.location='materials.html?matkul=${m.id}'">
+                <div class="w-12 h-12 rounded-xl gradient-primary flex items-center justify-center text-white"><i class="fas fa-book"></i></div>
+                <div class="flex-1 min-w-0"><p class="font-semibold text-sm truncate">${m.nama}</p><p class="text-xs text-gray-400">${prodi ? prodi.nama : ''} • ${dosen ? dosen.nama : ''}</p></div>
+                <span class="text-xs text-gray-400">${m.sks} SKS</span>
+              </div>`;
+            }).join('')}
+            ${enrolled.length === 0 ? '<p class="text-gray-400 text-sm text-center py-8">Belum ada mata kuliah yang diambil</p>' : ''}
+          </div>
+        </div>
+
+        <!-- Upcoming Deadlines -->
+        <div class="bg-white rounded-2xl border border-gray-100 p-6">
+          <h2 class="font-bold text-gray-900 mb-4"><i class="fas fa-clock text-amber-500 mr-2"></i>Tugas Mendatang</h2>
+          <div class="space-y-3">
+            ${upcoming.slice(0, 5).map(t => `<div class="p-3 rounded-xl bg-amber-50 border border-amber-100">
+              <p class="font-medium text-sm text-gray-800">${t.judul}</p>
+              <p class="text-xs text-gray-400 mt-1">${t.matkul}</p>
+              <p class="text-xs text-amber-600 mt-1"><i class="fas fa-calendar mr-1"></i>${Utils.formatDate(t.deadline)}</p>
+            </div>`).join('')}
+            ${upcoming.length === 0 ? '<p class="text-gray-400 text-sm text-center py-4">Tidak ada tugas mendatang</p>' : ''}
+          </div>
+        </div>
+      </div>
+    </main>
+    ` + closeSidebarLayout();
+  </script>
+</body>
+</html>

@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pengumpulan Tugas - Dosen - Polimicro</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="../assets/css/custom.css">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-50" style="background:#faf8f5">
+  <div id="app"></div>
+  <div id="grade-modal" class="fixed inset-0 z-50 hidden items-center justify-center modal-overlay">
+    <div class="bg-white rounded-3xl shadow-2xl p-8 max-w-md w-full mx-4 fade-in">
+      <h3 class="text-xl font-bold mb-4">Beri Nilai</h3>
+      <form id="grade-form" class="space-y-4">
+        <input type="hidden" id="gf-id">
+        <p class="text-sm text-gray-600" id="gf-info"></p>
+        <div><label class="block text-sm font-medium text-gray-600 mb-1">Nilai (0-100)</label><input type="number" id="gf-nilai" min="0" max="100" required class="w-full px-4 py-3 rounded-xl border border-gray-200"></div>
+        <div><label class="block text-sm font-medium text-gray-600 mb-1">Feedback</label><textarea id="gf-feedback" rows="3" class="w-full px-4 py-3 rounded-xl border border-gray-200"></textarea></div>
+        <div class="flex gap-3">
+          <button type="button" onclick="closeGradeModal()" class="flex-1 py-3 rounded-xl border border-gray-200 text-gray-600 font-medium">Batal</button>
+          <button type="submit" class="flex-1 py-3 btn-primary text-white rounded-xl font-semibold">Simpan Nilai</button>
+        </div>
+      </form>
+    </div>
+  </div>
+  <script src="../assets/js/data.js"></script><script src="../assets/js/auth.js"></script><script src="../assets/js/utils.js"></script><script src="../assets/js/sidebar.js"></script>
+  <script>
+    if (!Auth.requireAuth(['dosen'])) throw '';
+    const user = Auth.getCurrentUser();
+    const myMatkul = PoliData.getMatkulByDosen(user.id);
+    const params = new URLSearchParams(window.location.search);
+    const filterTugas = params.get('tugas');
+
+    document.getElementById('app').innerHTML = buildSidebar('dosen', 'submissions') + `
+    <main class="p-6 lg:p-8 fade-in">
+      <h1 class="text-2xl font-bold text-gray-900 mb-2">Pengumpulan Tugas</h1>
+      <p class="text-gray-500 mb-6">Lihat dan nilai tugas yang dikumpulkan mahasiswa</p>
+      <select id="filter" class="px-4 py-3 rounded-xl border border-gray-200 bg-white text-sm mb-6" onchange="render()">
+        <option value="all">Semua Tugas</option>
+        ${myMatkul.flatMap(m => PoliData.getTugasByMatkul(m.id)).map(t => `<option value="${t.id}" ${filterTugas == t.id ? 'selected' : ''}>${t.judul}</option>`).join('')}
+      </select>
+      <div id="sub-list"></div>
+    </main>` + closeSidebarLayout();
+
+    function render() {
+      const f = document.getElementById('filter').value;
+      const list = document.getElementById('sub-list');
+      let allTugas = myMatkul.flatMap(m => PoliData.getTugasByMatkul(m.id));
+      if (f !== 'all') allTugas = allTugas.filter(t => t.id == f);
+
+      let html = '';
+      allTugas.forEach(t => {
+        const subs = PoliData.getSubmissionsByTugas(t.id);
+        const matkul = PoliData.getMatkulById(t.matkul_id);
+        if (!subs.length) return;
+        html += `<div class="bg-white rounded-2xl border border-gray-100 mb-4 overflow-hidden">
+          <div class="p-5 border-b border-gray-50"><h3 class="font-bold">${t.judul}</h3><p class="text-xs text-gray-400">${matkul ? matkul.nama : ''} • Deadline: ${Utils.formatDate(t.deadline)}</p></div>
+          <div class="overflow-x-auto"><table class="w-full text-sm">
+            <thead><tr class="bg-gray-50" style="background:#faf8f5"><th class="px-5 py-3 text-left font-semibold text-gray-600">Mahasiswa</th><th class="px-5 py-3 text-left font-semibold text-gray-600">File</th><th class="px-5 py-3 text-left font-semibold text-gray-600">Tanggal</th><th class="px-5 py-3 text-center font-semibold text-gray-600">Nilai</th><th class="px-5 py-3 text-center font-semibold text-gray-600">Aksi</th></tr></thead>
+            <tbody class="divide-y divide-gray-50">${subs.map(s => {
+              const mhs = PoliData.getUserById(s.mahasiswa_id);
+              return `<tr class="hover:bg-gray-50">
+                <td class="px-5 py-4"><div class="flex items-center gap-3"><div class="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center text-xs font-bold text-green-700">${mhs ? Utils.getInitials(mhs.nama) : '?'}</div><div><p class="font-medium">${mhs ? mhs.nama : '-'}</p><p class="text-xs text-gray-400">${mhs ? mhs.nim : ''}</p></div></div></td>
+                <td class="px-5 py-4 text-gray-500 text-xs">${s.file_url}</td>
+                <td class="px-5 py-4 text-gray-400 text-xs">${Utils.formatShortDate(s.submitted_at)}</td>
+                <td class="px-5 py-4 text-center font-bold">${s.nilai !== null ? s.nilai : '<span class="text-gray-300">-</span>'}</td>
+                <td class="px-5 py-4 text-center"><button onclick="openGrade(${s.id})" class="px-4 py-2 bg-green-50 text-green-600 rounded-lg text-xs hover:bg-green-100 font-medium"><i class="fas fa-pen mr-1"></i>${s.nilai !== null ? 'Edit' : 'Nilai'}</button></td>
+              </tr>`;
+            }).join('')}</tbody>
+          </table></div>
+        </div>`;
+      });
+      list.innerHTML = html || '<div class="text-center py-16 text-gray-400"><i class="fas fa-inbox text-4xl mb-4"></i><p>Belum ada pengumpulan</p></div>';
+    }
+
+    function openGrade(subId) {
+      const s = PoliData.submissions.find(x => x.id === subId);
+      const mhs = PoliData.getUserById(s.mahasiswa_id);
+      const t = PoliData.tugas.find(x => x.id === s.tugas_id);
+      document.getElementById('gf-id').value = s.id;
+      document.getElementById('gf-info').textContent = `${mhs ? mhs.nama : '-'} - ${t ? t.judul : ''}`;
+      document.getElementById('gf-nilai').value = s.nilai || '';
+      document.getElementById('gf-feedback').value = s.feedback || '';
+      document.getElementById('grade-modal').classList.remove('hidden');
+      document.getElementById('grade-modal').classList.add('flex');
+    }
+    function closeGradeModal() { document.getElementById('grade-modal').classList.add('hidden'); document.getElementById('grade-modal').classList.remove('flex'); }
+
+    document.getElementById('grade-form').addEventListener('submit', e => {
+      e.preventDefault();
+      const i = PoliData.submissions.findIndex(s => s.id == document.getElementById('gf-id').value);
+      if (i !== -1) {
+        PoliData.submissions[i].nilai = parseInt(document.getElementById('gf-nilai').value);
+        PoliData.submissions[i].feedback = document.getElementById('gf-feedback').value;
+        saveData(); closeGradeModal(); render(); Utils.showToast('Nilai berhasil disimpan');
+      }
+    });
+    render();
+  </script>
+</body>
+</html>
