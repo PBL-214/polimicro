@@ -7,6 +7,7 @@ use App\Http\Controllers\ProgramController;
 // ---- PUBLIC ROUTES ----
 Route::get('/', fn() => view('welcome'))->name('home');
 Route::get('/faq', fn() => view('faq'))->name('faq');
+Route::get('/verify-certificate/{nomor_sertifikat}', [\App\Http\Controllers\CertificateVerificationController::class, 'verify'])->name('verify.certificate');
 
 Route::middleware('guest')->group(function () {
     Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
@@ -38,6 +39,12 @@ Route::prefix('mahasiswa')->middleware(['auth', 'role:mahasiswa'])->name('mahasi
     Route::get('/profile', [\App\Http\Controllers\Mahasiswa\ProfileController::class, 'index'])->name('profile');
     Route::put('/profile', [\App\Http\Controllers\Mahasiswa\ProfileController::class, 'update'])->name('profile.update');
     Route::put('/profile/password', [\App\Http\Controllers\Mahasiswa\ProfileController::class, 'changePassword'])->name('profile.password');
+
+    // Quizzes for Mahasiswa
+    Route::get('/courses/{course}/quizzes/{quiz}/take', [\App\Http\Controllers\Mahasiswa\QuizController::class, 'take'])->name('courses.quizzes.take');
+    Route::post('/courses/{course}/quizzes/{quiz}/start', [\App\Http\Controllers\Mahasiswa\QuizController::class, 'start'])->name('courses.quizzes.start');
+    Route::post('/courses/{course}/quizzes/{quiz}/submit', [\App\Http\Controllers\Mahasiswa\QuizController::class, 'submit'])->name('courses.quizzes.submit');
+    Route::get('/courses/{course}/quizzes/attempt/{attempt}/result', [\App\Http\Controllers\Mahasiswa\QuizController::class, 'result'])->name('courses.quizzes.result');
 });
 
 // ---- DOSEN ROUTES ----
@@ -56,6 +63,9 @@ Route::prefix('dosen')->middleware(['auth', 'role:dosen'])->name('dosen.')->grou
     Route::get('/submissions', [\App\Http\Controllers\Dosen\SubmissionController::class, 'index'])->name('submissions');
     Route::put('/submissions/{submission}/grade', [\App\Http\Controllers\Dosen\SubmissionController::class, 'grade'])->name('submissions.grade');
     Route::get('/students', [\App\Http\Controllers\Dosen\StudentController::class, 'index'])->name('students');
+    
+    // Quizzes for Dosen
+    Route::resource('quizzes', \App\Http\Controllers\Dosen\QuizController::class);
 });
 
 // ---- ADMIN PIC ROUTES ----

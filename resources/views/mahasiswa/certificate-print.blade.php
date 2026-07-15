@@ -121,6 +121,13 @@
                 </p>
             </div>
             
+            <div class="absolute bottom-16 right-16 flex flex-col items-center">
+                <div class="w-24 h-24 mb-2 p-1 bg-white border border-slate-200 shadow-sm rounded-lg flex justify-center items-center">
+                    <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data={{ urlencode($verificationUrl) }}" alt="QR Code" class="w-full h-full object-cover">
+                </div>
+                <p class="text-[9px] font-bold text-slate-500 uppercase tracking-wider text-center">TTE & Verifikasi<br>Scan QR Code</p>
+            </div>
+            
             <div class="absolute bottom-24 w-full flex justify-center mt-8">
                 <div class="text-center border-t border-slate-400 pt-4 px-12">
                     <p class="text-base font-extrabold tracking-[0.1em] text-slate-800 uppercase">Direktur Program</p>

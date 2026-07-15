@@ -19,6 +19,8 @@ class CertificateController extends Controller
         $user = Auth::user();
         $sertifikat = $user->sertifikat()->with('prodi')->findOrFail($id);
         
-        return view('mahasiswa.certificate-print', compact('sertifikat', 'user'));
+        $verificationUrl = route('verify.certificate', $sertifikat->nomor_sertifikat);
+        
+        return view('mahasiswa.certificate-print', compact('sertifikat', 'user', 'verificationUrl'));
     }
 }

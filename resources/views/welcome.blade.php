@@ -120,54 +120,70 @@
     /* Dramatic heading sizes */
     .section-heading { font-size: clamp(2rem, 5vw, 3rem); font-weight: 800; }
 
-    /* Animated Microcredential Diagram */
-    .mc-anim-container {
-      position: absolute;
-      top: 50%; right: -2rem;
-      transform: translateY(-50%);
-      width: 120px;
-      display: flex; flex-direction: column; gap: 1rem;
-      z-index: 30;
-    }
-    .mc-anim-step {
-      background: white; border-radius: 12px; padding: 10px;
-      box-shadow: 0 8px 20px rgba(0,0,0,0.08);
-      display: flex; items-center; gap: 10px;
-      border: 1px solid #f1f5f9;
-      opacity: 0.4; transform: scale(0.9) translateX(20px);
-      transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-    }
-    .mc-anim-step.active {
-      opacity: 1; transform: scale(1) translateX(0);
-      box-shadow: 0 12px 24px rgba(22, 163, 74, 0.15);
-      border-color: #ecfeff;
-    }
-    .mc-anim-step.completed {
-      opacity: 0.8; transform: scale(0.95) translateX(10px);
-    }
-    .mc-icon-wrap {
-      width: 32px; height: 32px; border-radius: 8px;
-      display: flex; align-items: center; justify-content: center;
-      flex-shrink: 0;
-    }
-    .mc-anim-line {
-      width: 2px; height: 16px; background: #e2e8f0;
-      margin: -8px auto -8px 24px; position: relative; z-index: -1;
-    }
-    .mc-anim-line::after {
-      content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 0%;
-      background: #06b6d4; transition: height 0.5s ease;
-    }
-    .mc-anim-line.filled::after { height: 100%; }
+    /* Dashboard Demo Animations */
+    .perspective-1000 { perspective: 1000px; }
     
-    /* Ping animation for the active step */
-    @keyframes pulse-ring {
-      0% { box-shadow: 0 0 0 0 rgba(22, 163, 74, 0.4); }
-      70% { box-shadow: 0 0 0 10px rgba(22, 163, 74, 0); }
-      100% { box-shadow: 0 0 0 0 rgba(22, 163, 74, 0); }
+    .stats-card {
+      opacity: 0;
+      transform: translateY(10px);
+      animation: slideUpFade 0.6s cubic-bezier(0.4, 0, 0.2, 1) forwards;
     }
-    .mc-anim-step.active .mc-icon-wrap {
-      animation: pulse-ring 2s infinite;
+    
+    .course-card {
+      opacity: 0;
+      transform: translateY(10px);
+      animation: slideUpFade 0.6s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+    }
+    
+    .anim-delay-1 { animation-delay: 0.2s; }
+    .anim-delay-2 { animation-delay: 0.4s; }
+    .anim-delay-3 { animation-delay: 0.6s; }
+    .anim-delay-4 { animation-delay: 0.8s; }
+    
+    @keyframes slideUpFade {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    
+    .progress-bar-anim {
+      animation: fillProgress 1.5s cubic-bezier(0.4, 0, 0.2, 1) 1.2s forwards;
+    }
+    
+    @keyframes fillProgress {
+      from { width: 0%; }
+      to { width: 65%; }
+    }
+    
+    .float-notification {
+      animation: popIn 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) 2.5s forwards, floatUpDown 3s ease-in-out infinite 3s;
+    }
+    
+    @keyframes popIn {
+      from { opacity: 0; transform: scale(0.8) translateY(10px); }
+      to { opacity: 1; transform: scale(1) translateY(0); }
+    }
+    
+    @keyframes floatUpDown {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-5px); }
+    }
+    
+    /* Cursor Animation */
+    .cursor-anim {
+      top: 80%; left: 80%;
+      animation: moveCursor 6s ease-in-out infinite;
+    }
+    
+    @keyframes moveCursor {
+      0% { top: 80%; left: 80%; opacity: 0; }
+      10% { opacity: 1; }
+      25% { top: 30%; left: 20%; transform: scale(0.9); }
+      30% { transform: scale(1); } /* Click effect */
+      50% { top: 50%; left: 60%; transform: scale(0.9); }
+      55% { transform: scale(1); }
+      75% { top: 70%; left: 85%; }
+      90% { opacity: 1; }
+      100% { top: 80%; left: 80%; opacity: 0; }
     }
   </style>
 </head>
@@ -265,106 +281,134 @@
         </div>
       </div>
 
-      <!-- Hero visual: mini dashboard card dengan animasi proses Microcredential -->
-      <div class="hidden md:block relative h-[480px]">
+      <!-- Hero visual: Dashboard Demo Animation -->
+      <div class="hidden md:block relative w-full h-[500px] perspective-1000 pl-8 group">
+        <!-- Abstract background elements -->
+        <div class="absolute inset-0 bg-gradient-to-br from-cyan-200/40 to-blue-200/20 rounded-[2.5rem] transform rotate-2 scale-105 ml-8 transition-all duration-500 group-hover:-translate-y-3 group-hover:scale-105 group-hover:rotate-2 group-hover:shadow-xl"></div>
         
-        <!-- Microcredential Process Animation -->
-        <div class="mc-anim-container hidden lg:flex">
-          <div class="mc-anim-step" id="step-1">
-            <div class="mc-icon-wrap bg-cyan-100 text-cyan-600"><i class="fas fa-book-reader"></i></div>
-            <div>
-              <p class="text-[10px] font-bold uppercase tracking-wider text-slate-500">Langkah 1</p>
-              <p class="text-xs font-semibold text-slate-900">Belajar Skill</p>
+        <!-- Browser Mockup -->
+        <div class="absolute inset-0 bg-white rounded-2xl shadow-[0_20px_50px_-12px_rgba(0,0,0,0.15)] border border-slate-200 overflow-hidden flex flex-col transform transition-all duration-500 z-10 ml-8 group-hover:-translate-y-3 group-hover:shadow-[0_30px_60px_-15px_rgba(0,0,0,0.2)]">
+          <!-- Browser Header -->
+          <div class="h-10 bg-slate-50 border-b border-slate-200 flex items-center px-4 gap-2">
+            <div class="flex gap-1.5">
+              <div class="w-3 h-3 rounded-full bg-red-400"></div>
+              <div class="w-3 h-3 rounded-full bg-amber-400"></div>
+              <div class="w-3 h-3 rounded-full bg-green-400"></div>
+            </div>
+            <div class="mx-auto px-4 py-1.5 bg-white rounded-md text-[10px] text-slate-400 border border-slate-200 shadow-sm font-medium w-1/2 flex items-center justify-center gap-2">
+              <i class="fas fa-lock text-[8px] text-slate-400"></i> polimicro.ac.id/dashboard
             </div>
           </div>
-          <div class="mc-anim-line" id="line-1"></div>
-          <div class="mc-anim-step" id="step-2">
-            <div class="mc-icon-wrap bg-slate-100 text-slate-600"><i class="fas fa-laptop-code"></i></div>
-            <div>
-              <p class="text-[10px] font-bold uppercase tracking-wider text-slate-500">Langkah 2</p>
-              <p class="text-xs font-semibold text-slate-900">Kerjakan Proyek</p>
-            </div>
-          </div>
-          <div class="mc-anim-line" id="line-2"></div>
-          <div class="mc-anim-step" id="step-3">
-            <div class="mc-icon-wrap bg-cyan-100 text-cyan-600"><i class="fas fa-award"></i></div>
-            <div>
-              <p class="text-[10px] font-bold uppercase tracking-wider text-slate-500">Hasil Akhir</p>
-              <p class="text-xs font-semibold text-slate-900">Dapat Sertifikat</p>
-            </div>
-          </div>
-        </div>
-
-        <div class="float-card absolute top-0 right-10 float-anim z-20">
-          <div class="flex items-center gap-3">
-            <div class="w-10 h-10 rounded-xl bg-cyan-100 flex items-center justify-center">
-              <i class="fas fa-check-circle text-cyan-600"></i>
-            </div>
-            <div>
-              <p class="font-bold text-sm text-slate-900">Micro-Sertifikat</p>
-              <p class="text-xs text-slate-500">Diakui Industri</p>
-            </div>
-          </div>
-        </div>
-
-        <!-- Mini dashboard mockup -->
-        <div class="w-72 lg:w-80 mx-auto rounded-[2rem] bg-white border border-slate-200 shadow-2xl mt-8 overflow-hidden z-10 relative">
-          <div class="bg-gradient-to-r from-slate-800 to-cyan-700 px-5 py-4 flex items-center justify-between">
-            <div>
-              <p class="text-white/70 text-xs font-medium mb-0.5">Polimicro Learning</p>
-              <p class="text-white font-bold text-sm">Path: Web Developer 👋</p>
-            </div>
-            <div class="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center">
-              <i class="fas fa-graduation-cap text-white text-xs"></i>
-            </div>
-          </div>
-          <div class="p-4 space-y-3">
-            <p class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Modul Kompetensi</p>
-            <div class="flex items-center gap-3 p-3 bg-cyan-50 rounded-xl">
-              <div class="w-9 h-9 rounded-lg bg-cyan-600 flex items-center justify-center flex-shrink-0">
-                <i class="fas fa-laptop-code text-white text-sm"></i>
+          
+          <!-- Dashboard Body -->
+          <div class="flex-1 flex bg-slate-50 relative overflow-hidden">
+            <!-- Sidebar -->
+            <div class="w-16 lg:w-44 bg-white border-r border-slate-200 p-4 flex flex-col gap-4">
+              <div class="flex items-center gap-2 mb-4">
+                <div class="w-8 h-8 rounded-lg bg-cyan-600 flex-shrink-0 flex items-center justify-center"><i class="fas fa-graduation-cap text-white text-xs"></i></div>
+                <div class="h-3 bg-slate-200 rounded w-20 hidden lg:block"></div>
               </div>
-              <div class="flex-1 min-w-0">
-                <p class="text-xs font-bold text-slate-900 truncate">Frontend React.js</p>
-                <div class="w-full h-1.5 bg-slate-100 rounded-full mt-1.5">
-                  <div class="h-1.5 bg-cyan-500 rounded-full" style="width:100%"></div>
+              
+              <div class="flex items-center gap-3 p-2.5 rounded-lg bg-cyan-50 text-cyan-600">
+                <i class="fas fa-th-large w-5 text-center text-sm"></i>
+                <div class="h-2.5 bg-cyan-200 rounded w-16 hidden lg:block"></div>
+              </div>
+              <div class="flex items-center gap-3 p-2.5 rounded-lg text-slate-400">
+                <i class="fas fa-book w-5 text-center text-sm"></i>
+                <div class="h-2.5 bg-slate-200 rounded w-20 hidden lg:block"></div>
+              </div>
+              <div class="flex items-center gap-3 p-2.5 rounded-lg text-slate-400">
+                <i class="fas fa-award w-5 text-center text-sm"></i>
+                <div class="h-2.5 bg-slate-200 rounded w-16 hidden lg:block"></div>
+              </div>
+              
+              <div class="mt-auto flex items-center gap-3 p-2.5 rounded-lg text-slate-400">
+                <div class="w-7 h-7 rounded-full bg-slate-200 flex-shrink-0"></div>
+                <div class="h-2.5 bg-slate-200 rounded w-16 hidden lg:block"></div>
+              </div>
+            </div>
+            
+            <!-- Main Content -->
+            <div class="flex-1 p-5 flex flex-col gap-5 relative">
+              <!-- Header -->
+              <div class="flex justify-between items-end">
+                <div>
+                  <div class="h-4 bg-slate-800 rounded w-32 mb-2"></div>
+                  <div class="h-2.5 bg-slate-400 rounded w-48"></div>
+                </div>
+                <div class="px-3 py-1.5 bg-white border border-slate-200 rounded-lg text-[10px] font-bold text-slate-600 flex items-center gap-2">
+                   <i class="fas fa-calendar-alt text-cyan-600"></i> Semester Ganjil
                 </div>
               </div>
-              <span class="text-xs font-bold text-cyan-600 flex-shrink-0"><i class="fas fa-check-circle"></i></span>
-            </div>
-            <div class="flex items-center gap-3 p-3 bg-slate-50 rounded-xl">
-              <div class="w-9 h-9 rounded-lg bg-slate-600 flex items-center justify-center flex-shrink-0">
-                <i class="fas fa-database text-white text-sm"></i>
-              </div>
-              <div class="flex-1 min-w-0">
-                <p class="text-xs font-bold text-slate-900 truncate">Backend API (Laravel)</p>
-                <div class="w-full h-1.5 bg-slate-100 rounded-full mt-1.5">
-                  <div class="h-1.5 bg-slate-500 rounded-full anim-progress" style="width:60%"></div>
+              
+              <!-- Stats Row -->
+              <div class="grid grid-cols-3 gap-3">
+                <div class="bg-white p-3 rounded-xl shadow-sm border border-slate-100 stats-card anim-delay-1 flex flex-col justify-between">
+                  <div class="h-2.5 bg-slate-300 rounded w-16 mb-2"></div>
+                  <div class="flex items-end gap-2">
+                    <div class="h-6 bg-cyan-600 rounded w-8"></div>
+                    <div class="h-2 bg-green-200 rounded w-10 mb-1"></div>
+                  </div>
+                </div>
+                <div class="bg-white p-3 rounded-xl shadow-sm border border-slate-100 stats-card anim-delay-2 flex flex-col justify-between">
+                  <div class="h-2.5 bg-slate-300 rounded w-20 mb-2"></div>
+                  <div class="flex items-end gap-2">
+                    <div class="h-6 bg-slate-700 rounded w-12"></div>
+                  </div>
+                </div>
+                <div class="bg-white p-3 rounded-xl shadow-sm border border-slate-100 stats-card anim-delay-3 flex flex-col justify-between">
+                  <div class="h-2.5 bg-slate-300 rounded w-14 mb-2"></div>
+                  <div class="flex items-end gap-2">
+                    <div class="h-6 bg-orange-500 rounded w-6"></div>
+                  </div>
                 </div>
               </div>
-              <span class="text-xs font-bold text-slate-600 flex-shrink-0">60%</span>
-            </div>
-            <div class="flex items-center gap-3 p-3 rounded-xl bg-orange-50 border border-orange-100">
-              <div class="w-9 h-9 rounded-lg bg-gradient-to-br from-orange-400 to-red-500 flex items-center justify-center flex-shrink-0 shadow-lg shadow-orange-500/30">
-                <i class="fas fa-medal text-white text-sm"></i>
+              
+              <!-- Active Course -->
+              <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-100 flex-1 relative course-card anim-delay-4 flex flex-col">
+                <div class="flex justify-between items-center mb-4">
+                   <div class="h-3 bg-slate-800 rounded w-32"></div>
+                   <div class="w-5 h-5 rounded bg-slate-100 flex items-center justify-center"><i class="fas fa-ellipsis-h text-[10px] text-slate-400"></i></div>
+                </div>
+                
+                <div class="flex gap-4 items-center mb-4">
+                  <div class="w-12 h-12 rounded-lg bg-cyan-50 flex-shrink-0 flex items-center justify-center border border-cyan-100">
+                    <i class="fas fa-laptop-code text-cyan-600 text-lg"></i>
+                  </div>
+                  <div class="flex-1 space-y-2">
+                    <div class="h-3 bg-slate-800 rounded w-3/4"></div>
+                    <div class="h-2.5 bg-slate-400 rounded w-1/2"></div>
+                  </div>
+                </div>
+                
+                <div class="mt-auto">
+                  <div class="flex justify-between text-[10px] font-bold text-slate-500 mb-1.5">
+                    <span>Progress Pembelajaran</span>
+                    <span class="text-cyan-600">65%</span>
+                  </div>
+                  <div class="h-1.5 w-full bg-slate-100 rounded-full overflow-hidden">
+                    <div class="h-full bg-cyan-500 rounded-full progress-bar-anim" style="width: 0%"></div>
+                  </div>
+                </div>
+                
+                <!-- Floating Notification -->
+                <div class="absolute -right-6 -bottom-6 bg-white p-3 rounded-xl shadow-[0_10px_25px_rgba(0,0,0,0.1)] border border-slate-100 flex items-center gap-3 float-notification opacity-0 z-20">
+                  <div class="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center text-green-600">
+                    <i class="fas fa-check text-xs"></i>
+                  </div>
+                  <div>
+                    <div class="text-xs font-bold text-slate-800">Tugas Dinilai</div>
+                    <div class="text-[10px] text-slate-500">Selamat! Anda dapat 95</div>
+                  </div>
+                </div>
               </div>
-              <div class="flex-1">
-                <p class="text-xs font-bold text-slate-900">Portfolio Keahlian</p>
-                <p class="text-[10px] text-orange-600 font-medium">1 Badge Didapatkan</p>
-              </div>
-              <i class="fas fa-chevron-right text-orange-300 text-xs flex-shrink-0"></i>
             </div>
-          </div>
-        </div>
-
-        <div class="float-card absolute -bottom-4 left-4 float-anim-delay z-20">
-          <div class="flex items-center gap-3">
-            <div class="w-9 h-9 rounded-lg bg-slate-100 flex items-center justify-center">
-              <i class="fas fa-bullseye text-slate-600 text-sm"></i>
-            </div>
-            <div>
-              <p class="font-bold text-sm text-slate-900">Fokus Skill Spesifik</p>
-              <p class="text-xs text-slate-500">Bukan teori umum</p>
+            
+            <!-- Animated cursor -->
+            <div class="absolute w-5 h-5 cursor-anim z-50 pointer-events-none drop-shadow-md">
+              <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M5.5 3.21V20.8C5.5 21.45 6.27 21.78 6.74 21.34L11.45 16.92C11.64 16.74 11.89 16.64 12.15 16.64H18.78C19.46 16.64 19.8 15.82 19.32 15.34L6.71 2.73C6.23 2.25 5.5 2.59 5.5 3.21Z" fill="#1e293b" stroke="white" stroke-width="1.5"/>
+              </svg>
             </div>
           </div>
         </div>
@@ -569,7 +613,6 @@
       </div>
     </div>
   </section>
->
   </section>
 
   <!-- Footer -->
@@ -666,50 +709,17 @@
     const statsSection = document.querySelector('#stats-section');
     if (statsSection) counterObserver.observe(statsSection);
 
-    // Microcredential Hero Animation sequence
-    function runHeroAnimation() {
-      const s1 = document.getElementById('step-1');
-      const s2 = document.getElementById('step-2');
-      const s3 = document.getElementById('step-3');
-      const l1 = document.getElementById('line-1');
-      const l2 = document.getElementById('line-2');
-      
-      const reset = () => {
-        s1.className = 'mc-anim-step'; s2.className = 'mc-anim-step'; s3.className = 'mc-anim-step';
-        l1.className = 'mc-anim-line'; l2.className = 'mc-anim-line';
-      };
-
-      const sequence = () => {
-        reset();
-        
-        // Step 1 Active
-        setTimeout(() => s1.classList.add('active'), 500);
-        
-        // Step 1 Complete, Line 1 fills, Step 2 Active
-        setTimeout(() => {
-          s1.classList.remove('active'); s1.classList.add('completed');
-          l1.classList.add('filled');
-          s2.classList.add('active');
-        }, 2500);
-
-        // Step 2 Complete, Line 2 fills, Step 3 Active (Certificate)
-        setTimeout(() => {
-          s2.classList.remove('active'); s2.classList.add('completed');
-          l2.classList.add('filled');
-          s3.classList.add('active');
-        }, 4500);
-
-        // Hold Step 3, then repeat
-        setTimeout(sequence, 8000);
-      };
-
-      sequence();
-    }
-    
-    // Start animation if the container exists
-    if(document.querySelector('.mc-anim-container')) {
-      runHeroAnimation();
-    }
+    // Progress bar animation for the new course card
+    setTimeout(() => {
+        const progs = document.querySelectorAll('.progress-bar-anim');
+        progs.forEach(prog => {
+            prog.style.width = '0%';
+            setTimeout(() => {
+                prog.style.transition = 'width 1.5s cubic-bezier(0.4, 0, 0.2, 1)';
+                prog.style.width = '65%';
+            }, 1200);
+        });
+    }, 100);
     
     // Progress bar animation
     setTimeout(() => {

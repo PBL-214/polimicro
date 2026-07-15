@@ -22,6 +22,10 @@ class CourseController extends Controller
         $materials = $course->materi()->get();
         $assignments = $course->tugas()->withCount('submissions')->get();
         
-        return view('dosen.course-detail', compact('course', 'materials', 'assignments'));
+        $quizzes = \App\Models\Quiz::where('makul_id', $course->id)
+            ->with(['attempts'])
+            ->get();
+        
+        return view('dosen.course-detail', compact('course', 'materials', 'assignments', 'quizzes'));
     }
 }

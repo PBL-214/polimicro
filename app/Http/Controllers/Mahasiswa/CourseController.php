@@ -41,6 +41,13 @@ class CourseController extends Controller
         // Get submissions by this student for this course's assignments
         $submissions = $user->submissions()->whereIn('tugas_id', $assignments->pluck('id'))->get();
         
-        return view('mahasiswa.course-detail', compact('course', 'materials', 'assignments', 'submissions'));
+        // Get quizzes for this course
+        $quizzes = \App\Models\Quiz::where('makul_id', $course->id)
+            ->where('status', 'published')
+            ->with(['attempts' => function($q) use ($user) {
+                $q->where('user_id', $user->id);
+            }])->get();
+        
+        return view('mahasiswa.course-detail', compact('course', 'materials', 'assignments', 'submissions', 'quizzes'));
     }
 }

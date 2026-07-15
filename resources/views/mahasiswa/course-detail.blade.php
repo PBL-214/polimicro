@@ -16,14 +16,25 @@
                                 <span class="font-semibold text-slate-700 group-hover:text-cyan-700 transition">Pertemuan {{ $index + 1 }}</span>
                                 <span class="text-[10px] text-slate-500 group-hover:text-cyan-600 truncate">{{ $mat->nama_materi }}</span>
                             </a>
-                            @php $connectedAssignments = $assignments->where('materi_id', $mat->id); @endphp
-                            @if($connectedAssignments->count() > 0)
+                            @php 
+                                $connectedAssignments = $assignments->where('materi_id', $mat->id); 
+                                $connectedQuizzes = $quizzes->where('materi_id', $mat->id);
+                            @endphp
+                            @if($connectedAssignments->count() > 0 || $connectedQuizzes->count() > 0)
                                 <ul class="ml-4 mt-1 space-y-1 border-l-2 border-slate-100 pl-3">
                                     @foreach($connectedAssignments as $t)
                                         <li>
                                             <a href="#tugas-{{ $t->id }}" class="flex items-center gap-2 py-1.5 text-xs text-slate-500 hover:text-cyan-600 transition group/tugas">
                                                 <i class="fas fa-tasks text-[10px] text-cyan-400 group-hover/tugas:text-cyan-600"></i> 
                                                 <span class="truncate">{{ $t->nama_tugas }}</span>
+                                            </a>
+                                        </li>
+                                    @endforeach
+                                    @foreach($connectedQuizzes as $q)
+                                        <li>
+                                            <a href="#kuis-{{ $q->id }}" class="flex items-center gap-2 py-1.5 text-xs text-slate-500 hover:text-cyan-600 transition group/tugas">
+                                                <i class="fas fa-question-circle text-[10px] text-cyan-400 group-hover/tugas:text-cyan-600"></i> 
+                                                <span class="truncate">Kuis: {{ $q->title }}</span>
                                             </a>
                                         </li>
                                     @endforeach
@@ -34,16 +45,27 @@
                         <li class="text-xs text-slate-400 italic">Belum ada materi</li>
                     @endforelse
                     
-                    @php $unconnectedAssignments = $assignments->whereNull('materi_id'); @endphp
-                    @if($unconnectedAssignments->count() > 0)
+                    @php 
+                        $unconnectedAssignments = $assignments->whereNull('materi_id'); 
+                        $unconnectedQuizzes = $quizzes->whereNull('materi_id');
+                    @endphp
+                    @if($unconnectedAssignments->count() > 0 || $unconnectedQuizzes->count() > 0)
                         <li class="pt-3 mt-3 border-t border-slate-100">
-                            <a href="#tugas-lainnya" class="font-semibold text-slate-700 hover:text-cyan-700 transition p-2 block rounded-xl hover:bg-cyan-50">Tugas Lainnya</a>
+                            <a href="#tugas-lainnya" class="font-semibold text-slate-700 hover:text-cyan-700 transition p-2 block rounded-xl hover:bg-cyan-50">Tugas & Evaluasi Lainnya</a>
                             <ul class="ml-4 mt-1 space-y-1 border-l-2 border-slate-100 pl-3">
                                 @foreach($unconnectedAssignments as $t)
                                     <li>
                                         <a href="#tugas-{{ $t->id }}" class="flex items-center gap-2 py-1.5 text-xs text-slate-500 hover:text-cyan-600 transition group/tugas">
                                             <i class="fas fa-tasks text-[10px] text-amber-400 group-hover/tugas:text-amber-600"></i> 
                                             <span class="truncate">{{ $t->nama_tugas }}</span>
+                                        </a>
+                                    </li>
+                                @endforeach
+                                @foreach($unconnectedQuizzes as $q)
+                                    <li>
+                                        <a href="#kuis-{{ $q->id }}" class="flex items-center gap-2 py-1.5 text-xs text-slate-500 hover:text-cyan-600 transition group/tugas">
+                                            <i class="fas fa-question-circle text-[10px] text-amber-400 group-hover/tugas:text-amber-600"></i> 
+                                            <span class="truncate">Kuis: {{ $q->title }}</span>
                                         </a>
                                     </li>
                                 @endforeach
@@ -138,11 +160,14 @@
                     @endif
                 </div>
 
-                {{-- Connected Assignments inside this Material --}}
-                @php $connectedAssignments = $assignments->where('materi_id', $mat->id); @endphp
-                @if($connectedAssignments->count() > 0)
+                {{-- Connected Assignments and Quizzes inside this Material --}}
+                @php 
+                    $connectedAssignments = $assignments->where('materi_id', $mat->id); 
+                    $connectedQuizzes = $quizzes->where('materi_id', $mat->id);
+                @endphp
+                @if($connectedAssignments->count() > 0 || $connectedQuizzes->count() > 0)
                     <div class="bg-cyan-50/20 border-t border-cyan-50/50 p-6 space-y-4">
-                        <span class="text-xs font-bold text-cyan-700 uppercase tracking-wider flex items-center gap-2"><i class="fas fa-tasks"></i> Tugas Terkait Materi</span>
+                        <span class="text-xs font-bold text-cyan-700 uppercase tracking-wider flex items-center gap-2"><i class="fas fa-tasks"></i> Tugas & Kuis Terkait Materi</span>
                         
                         @foreach($connectedAssignments as $t)
                             @php $sub = $submissions->firstWhere('tugas_id', $t->id); @endphp
@@ -192,6 +217,40 @@
                                 @endif
 							</div>
                         @endforeach
+
+                        @foreach($connectedQuizzes as $q)
+                            @php 
+                                $attempt = $q->attempts->first();
+                                $isCompleted = $attempt && $attempt->end_time;
+                                $isInProgress = $attempt && !$attempt->end_time;
+                            @endphp
+                            <div id="kuis-{{ $q->id }}" class="bg-white rounded-2xl border border-cyan-100 p-5 shadow-sm space-y-4 scroll-mt-28">
+                                <div class="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
+                                    <div class="flex-1">
+                                        <h4 class="font-bold text-gray-900 text-sm">Kuis: {{ $q->title }}</h4>
+                                        <p class="text-xs text-gray-500 mt-1 leading-relaxed">{{ $q->description }}</p>
+                                        <div class="flex flex-wrap gap-4 mt-3 text-[10px] text-gray-400 font-semibold uppercase tracking-wider">
+                                            <span class="flex items-center gap-1"><i class="fas fa-clock text-cyan-500"></i> Waktu: {{ $q->time_limit_minutes }} Menit</span>
+                                            <span class="flex items-center gap-1"><i class="fas fa-list-ol text-cyan-500"></i> {{ $q->questions->count() }} Soal</span>
+                                        </div>
+                                    </div>
+                                    <div class="flex flex-col items-start sm:items-end justify-center">
+                                        @if($isCompleted)
+                                            <div class="flex flex-col items-start sm:items-end gap-1">
+                                                <span class="px-3 py-1.5 rounded-xl text-xs font-bold bg-green-50 text-green-700 border border-green-100"><i class="fas fa-check-circle mr-1"></i>Nilai: {{ number_format($attempt->score, 1) }}</span>
+                                                <a href="{{ route('mahasiswa.courses.quizzes.result', ['course' => $course->id, 'attempt' => $attempt->id]) }}" class="text-[10px] text-cyan-600 font-bold hover:underline mt-1"><i class="fas fa-eye mr-1"></i>Lihat Detail Hasil</a>
+                                            </div>
+                                        @elseif($isInProgress)
+                                            <span class="px-3 py-1.5 rounded-xl text-xs font-bold bg-amber-50 text-amber-700 border border-amber-100 mb-2 inline-block"><i class="fas fa-spinner fa-spin mr-1"></i>Sedang Dikerjakan</span>
+                                            <a href="{{ route('mahasiswa.courses.quizzes.take', ['course' => $course->id, 'quiz' => $q->id]) }}" class="px-4 py-2 bg-amber-500 text-white rounded-xl text-xs font-bold hover:bg-amber-600 transition shadow-sm">Lanjutkan Kuis</a>
+                                        @else
+                                            <span class="px-3 py-1.5 rounded-xl text-xs font-bold bg-blue-50 text-blue-700 border border-blue-100 mb-2 inline-block"><i class="fas fa-play-circle mr-1"></i>Belum Dikerjakan</span>
+                                            <a href="{{ route('mahasiswa.courses.quizzes.take', ['course' => $course->id, 'quiz' => $q->id]) }}" class="px-4 py-2 bg-blue-600 text-white rounded-xl text-xs font-bold hover:bg-blue-700 transition shadow-sm">Mulai Kuis</a>
+                                        @endif
+                                    </div>
+                                </div>
+                            </div>
+                        @endforeach
                     </div>
                 @endif
             </div>
@@ -204,9 +263,12 @@
         @endforelse
     </div>
 
-    {{-- Unconnected Assignments (General/Tugas Lainnya) --}}
-    @php $unconnectedAssignments = $assignments->whereNull('materi_id'); @endphp
-    @if($unconnectedAssignments->count() > 0)
+    {{-- Unconnected Assignments and Quizzes (General/Tugas Lainnya) --}}
+    @php 
+        $unconnectedAssignments = $assignments->whereNull('materi_id'); 
+        $unconnectedQuizzes = $quizzes->whereNull('materi_id');
+    @endphp
+    @if($unconnectedAssignments->count() > 0 || $unconnectedQuizzes->count() > 0)
         <h3 id="tugas-lainnya" class="text-lg font-bold text-gray-900 mt-10 mb-4 font-serif flex items-center gap-2 scroll-mt-28"><i class="fas fa-folder-open text-amber-500"></i> Tugas & Evaluasi Lainnya</h3>
         <div class="space-y-4">
             @foreach($unconnectedAssignments as $t)
@@ -255,6 +317,40 @@
                     @if($sub && $sub->feedback)
                         <div class="mt-3 p-4 bg-cyan-50/50 rounded-xl text-xs text-cyan-800 border border-cyan-100/50"><i class="fas fa-comment mr-2 text-cyan-600"></i><b>Feedback Dosen:</b> {{ $sub->feedback }}</div>
                     @endif
+                </div>
+            @endforeach
+
+            @foreach($unconnectedQuizzes as $q)
+                @php 
+                    $attempt = $q->attempts->first();
+                    $isCompleted = $attempt && $attempt->end_time;
+                    $isInProgress = $attempt && !$attempt->end_time;
+                @endphp
+                <div id="kuis-{{ $q->id }}" class="bg-white rounded-3xl border border-gray-100 p-6 shadow-sm space-y-4 scroll-mt-28">
+                    <div class="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
+                        <div class="flex-1">
+                            <h4 class="font-bold text-gray-900 text-sm">Kuis: {{ $q->title }}</h4>
+                            <p class="text-xs text-gray-500 mt-1 leading-relaxed">{{ $q->description }}</p>
+                            <div class="flex flex-wrap gap-4 mt-3 text-[10px] text-gray-400 font-semibold uppercase tracking-wider">
+                                <span class="flex items-center gap-1"><i class="fas fa-clock text-cyan-500"></i> Waktu: {{ $q->time_limit_minutes }} Menit</span>
+                                <span class="flex items-center gap-1"><i class="fas fa-list-ol text-cyan-500"></i> {{ $q->questions->count() }} Soal</span>
+                            </div>
+                        </div>
+                        <div class="flex flex-col items-start sm:items-end justify-center">
+                            @if($isCompleted)
+                                <div class="flex flex-col items-start sm:items-end gap-1">
+                                    <span class="px-3 py-1.5 rounded-xl text-xs font-bold bg-green-50 text-green-700 border border-green-100"><i class="fas fa-check-circle mr-1"></i>Nilai: {{ number_format($attempt->score, 1) }}</span>
+                                    <a href="{{ route('mahasiswa.courses.quizzes.result', ['course' => $course->id, 'attempt' => $attempt->id]) }}" class="text-[10px] text-cyan-600 font-bold hover:underline mt-1"><i class="fas fa-eye mr-1"></i>Lihat Detail Hasil</a>
+                                </div>
+                            @elseif($isInProgress)
+                                <span class="px-3 py-1.5 rounded-xl text-xs font-bold bg-amber-50 text-amber-700 border border-amber-100 mb-2 inline-block"><i class="fas fa-spinner fa-spin mr-1"></i>Sedang Dikerjakan</span>
+                                <a href="{{ route('mahasiswa.courses.quizzes.take', ['course' => $course->id, 'quiz' => $q->id]) }}" class="px-4 py-2 bg-amber-500 text-white rounded-xl text-xs font-bold hover:bg-amber-600 transition shadow-sm">Lanjutkan Kuis</a>
+                            @else
+                                <span class="px-3 py-1.5 rounded-xl text-xs font-bold bg-blue-50 text-blue-700 border border-blue-100 mb-2 inline-block"><i class="fas fa-play-circle mr-1"></i>Belum Dikerjakan</span>
+                                <a href="{{ route('mahasiswa.courses.quizzes.take', ['course' => $course->id, 'quiz' => $q->id]) }}" class="px-4 py-2 bg-blue-600 text-white rounded-xl text-xs font-bold hover:bg-blue-700 transition shadow-sm">Mulai Kuis</a>
+                            @endif
+                        </div>
+                    </div>
                 </div>
             @endforeach
         </div>

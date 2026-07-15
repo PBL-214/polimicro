@@ -16,6 +16,7 @@
             <div class="flex flex-col sm:flex-row gap-3 flex-shrink-0">
                 <button onclick="openMateriModal()" class="px-5 py-3.5 bg-cyan-600 hover:bg-cyan-700 text-white rounded-xl font-bold text-xs shadow-lg shadow-cyan-600/20 transition flex items-center justify-center gap-2"><i class="fas fa-plus text-[10px]"></i> Tambah Materi</button>
                 <button onclick="openTugasModal()" class="px-5 py-3.5 bg-white/10 hover:bg-white/20 text-white rounded-xl border border-white/10 font-bold text-xs transition flex items-center justify-center gap-2"><i class="fas fa-tasks text-[10px]"></i> Buat Tugas</button>
+                <a href="{{ route('dosen.quizzes.create', ['makul_id' => $course->id]) }}" class="px-5 py-3.5 bg-white/10 hover:bg-white/20 text-white rounded-xl border border-white/10 font-bold text-xs transition flex items-center justify-center gap-2"><i class="fas fa-question-circle text-[10px]"></i> Buat Kuis</a>
             </div>
         </div>
         
@@ -101,11 +102,14 @@
                     @endif
                 </div>
 
-                {{-- Connected Assignments inside this Material --}}
-                @php $connectedAssignments = $assignments->where('materi_id', $mat->id); @endphp
-                @if($connectedAssignments->count() > 0)
+                {{-- Connected Assignments and Quizzes inside this Material --}}
+                @php 
+                    $connectedAssignments = $assignments->where('materi_id', $mat->id); 
+                    $connectedQuizzes = $quizzes->where('materi_id', $mat->id);
+                @endphp
+                @if($connectedAssignments->count() > 0 || $connectedQuizzes->count() > 0)
                     <div class="bg-cyan-50/20 border-t border-cyan-50/50 p-6 space-y-4">
-                        <span class="text-xs font-bold text-cyan-700 uppercase tracking-wider flex items-center gap-2"><i class="fas fa-tasks"></i> Tugas Terkait Materi</span>
+                        <span class="text-xs font-bold text-cyan-700 uppercase tracking-wider flex items-center gap-2"><i class="fas fa-tasks"></i> Tugas & Kuis Terkait Materi</span>
                         
                         @foreach($connectedAssignments as $t)
                             <div class="bg-white rounded-2xl border border-cyan-100 p-5 shadow-sm space-y-3">
@@ -136,6 +140,34 @@
                                 </div>
                             </div>
                         @endforeach
+                        
+                        @foreach($connectedQuizzes as $q)
+                            <div class="bg-white rounded-2xl border border-cyan-100 p-5 shadow-sm space-y-3">
+                                <div class="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
+                                    <div class="flex-1">
+                                        <h4 class="font-bold text-gray-900 text-sm">Kuis: {{ $q->title }}</h4>
+                                        <p class="text-xs text-gray-500 mt-1 leading-relaxed">{{ $q->description }}</p>
+                                        <div class="flex flex-wrap gap-4 mt-3 text-[10px] text-gray-400 font-semibold uppercase tracking-wider">
+                                            <span class="flex items-center gap-1"><i class="fas fa-clock text-cyan-500"></i> Waktu: {{ $q->time_limit_minutes }} Menit</span>
+                                            <span class="flex items-center gap-1"><i class="fas fa-list-ol text-cyan-500"></i> {{ $q->questions->count() }} Soal</span>
+                                            <span class="flex items-center gap-1 text-{{ $q->status === 'published' ? 'emerald' : 'slate' }}-600"><i class="fas fa-circle"></i> Status: {{ ucfirst($q->status) }}</span>
+                                            <span class="flex items-center gap-1 text-cyan-600"><i class="fas fa-users"></i> {{ $q->attempts->count() }} Percobaan</span>
+                                        </div>
+                                    </div>
+                                    
+                                    {{-- Actions for quiz --}}
+                                    <div class="flex gap-2 self-start">
+                                        <a href="{{ route('dosen.quizzes.show', $q->id) }}" class="px-4 py-2 bg-cyan-50 hover:bg-cyan-100 text-cyan-600 border border-cyan-100 rounded-lg text-xs font-bold transition flex items-center gap-1"><i class="fas fa-eye text-[10px]"></i> Detail Kuis</a>
+                                        <a href="{{ route('dosen.quizzes.edit', $q->id) }}" class="px-3 py-2 bg-cyan-50 text-cyan-600 rounded-lg text-xs hover:bg-cyan-100 border border-cyan-100 transition"><i class="fas fa-edit"></i></a>
+                                        <form method="POST" action="{{ route('dosen.quizzes.destroy', $q->id) }}" onsubmit="return confirm('Hapus kuis ini?')">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit" class="px-3 py-2 bg-red-50 text-red-600 rounded-lg text-xs hover:bg-red-100 transition border border-red-100"><i class="fas fa-trash"></i></button>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        @endforeach
                     </div>
                 @endif
             </div>
@@ -150,8 +182,11 @@
     </div>
 
     {{-- Unconnected Assignments (General/Tugas Lainnya) --}}
-    @php $unconnectedAssignments = $assignments->whereNull('materi_id'); @endphp
-    @if($unconnectedAssignments->count() > 0)
+    @php 
+        $unconnectedAssignments = $assignments->whereNull('materi_id'); 
+        $unconnectedQuizzes = $quizzes->whereNull('materi_id');
+    @endphp
+    @if($unconnectedAssignments->count() > 0 || $unconnectedQuizzes->count() > 0)
         <h3 class="text-lg font-bold text-gray-900 mt-10 mb-4 font-serif flex items-center gap-2"><i class="fas fa-folder-open text-amber-500"></i> Tugas & Evaluasi Lainnya</h3>
         <div class="space-y-4">
             @foreach($unconnectedAssignments as $t)
@@ -178,6 +213,34 @@
                                 @csrf
                                 @method('DELETE')
                                 <button class="px-3 py-2 bg-red-50 text-red-600 rounded-lg text-xs hover:bg-red-100 transition border border-red-100"><i class="fas fa-trash"></i></button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            @endforeach
+
+            @foreach($unconnectedQuizzes as $q)
+                <div class="bg-white rounded-3xl border border-gray-100 p-6 shadow-sm space-y-3">
+                    <div class="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
+                        <div class="flex-1">
+                            <h4 class="font-bold text-gray-900 text-sm">Kuis: {{ $q->title }}</h4>
+                            <p class="text-xs text-gray-500 mt-1 leading-relaxed">{{ $q->description }}</p>
+                            <div class="flex flex-wrap gap-4 mt-3 text-[10px] text-gray-400 font-semibold uppercase tracking-wider">
+                                <span class="flex items-center gap-1"><i class="fas fa-clock text-cyan-500"></i> Waktu: {{ $q->time_limit_minutes }} Menit</span>
+                                <span class="flex items-center gap-1"><i class="fas fa-list-ol text-cyan-500"></i> {{ $q->questions->count() }} Soal</span>
+                                <span class="flex items-center gap-1 text-{{ $q->status === 'published' ? 'emerald' : 'slate' }}-600"><i class="fas fa-circle"></i> Status: {{ ucfirst($q->status) }}</span>
+                                <span class="flex items-center gap-1 text-cyan-600"><i class="fas fa-users"></i> {{ $q->attempts->count() }} Percobaan</span>
+                            </div>
+                        </div>
+                        
+                        {{-- Actions for quiz --}}
+                        <div class="flex gap-2 self-start">
+                            <a href="{{ route('dosen.quizzes.show', $q->id) }}" class="px-4 py-2 bg-cyan-50 hover:bg-cyan-100 text-cyan-600 border border-cyan-100 rounded-lg text-xs font-bold transition flex items-center gap-1"><i class="fas fa-eye text-[10px]"></i> Detail Kuis</a>
+                            <a href="{{ route('dosen.quizzes.edit', $q->id) }}" class="px-3 py-2 bg-cyan-50 text-cyan-600 rounded-lg text-xs hover:bg-cyan-100 border border-cyan-100 transition"><i class="fas fa-edit"></i></a>
+                            <form method="POST" action="{{ route('dosen.quizzes.destroy', $q->id) }}" onsubmit="return confirm('Hapus kuis ini?')">
+                                @csrf
+                                @method('DELETE')
+                                <button type="submit" class="px-3 py-2 bg-red-50 text-red-600 rounded-lg text-xs hover:bg-red-100 transition border border-red-100"><i class="fas fa-trash"></i></button>
                             </form>
                         </div>
                     </div>
