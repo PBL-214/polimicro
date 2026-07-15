@@ -188,7 +188,7 @@
   </style>
 </head>
 
-<body class="bg-slate-50 text-slate-800">
+<body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col">
 
   <!-- Navbar -->
   <nav id="navbar" class="fixed top-0 w-full z-50 transition-all duration-300 bg-transparent">
@@ -613,10 +613,9 @@
       </div>
     </div>
   </section>
-  </section>
 
   <!-- Footer -->
-  <footer class="footer-section text-white py-16">
+  <footer class="footer-section text-white py-16 mt-auto">
     <div class="max-w-7xl mx-auto px-6">
       <div class="grid md:grid-cols-4 gap-10">
         <div>
