@@ -12,7 +12,7 @@ class User extends Authenticatable
 
     protected $fillable = [
         'name', 'email', 'password', 'phone', 'address',
-        'nim', 'nip', 'homebase',
+        'nim', 'nip', 'homebase', 'avatar',
     ];
 
     protected $hidden = ['password', 'remember_token'];
@@ -56,6 +56,11 @@ class User extends Authenticatable
     public function getInitials(): string
     {
         return strtoupper(collect(explode(' ', $this->name))->map(fn($w) => $w[0] ?? '')->take(2)->join(''));
+    }
+
+    public function getAvatarUrl(): ?string
+    {
+        return $this->avatar ? asset('storage/' . $this->avatar) : null;
     }
 
     // ---- RELATIONSHIPS ----
@@ -146,6 +151,26 @@ class User extends Authenticatable
             ->count();
 
         return $gradedTugasCount >= $allTugasCount;
+    }
+
+    // ---- FORUM & ATTENDANCE ----
+
+    /** User: forum discussions */
+    public function discussions()
+    {
+        return $this->hasMany(ForumDiscussion::class, 'user_id');
+    }
+
+    /** User: forum replies */
+    public function forumReplies()
+    {
+        return $this->hasMany(ForumReply::class, 'user_id');
+    }
+
+    /** Mahasiswa: attendance records */
+    public function attendanceRecords()
+    {
+        return $this->hasMany(AttendanceRecord::class, 'mahasiswa_id');
     }
 
     // ---- SCOPES ----

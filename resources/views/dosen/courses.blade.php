@@ -10,15 +10,18 @@
             $tugasCount = $m->tugas->count(); 
             $studentCount = $m->prodi->pendaftaranDiterima->count(); 
         @endphp 
-        <a href="{{ route('dosen.courses.show', $m->id) }}" class="block bg-white rounded-2xl border border-slate-100 overflow-hidden card-hover group transition-all duration-300 hover:shadow-xl hover:border-cyan-200 cursor-pointer"> 
-            <div class="gradient-card p-5 transition-colors group-hover:bg-cyan-50">
-                <h3 class="font-bold text-cyan-900 transition group-hover:text-cyan-700">{{ $m->nama_makul }}</h3>
-                <p class="text-cyan-700 text-xs mt-1 transition">{{ $m->prodi->nama_prodi ?? '' }}</p>
+        <a href="{{ route('dosen.courses.show', $m->id) }}" class="block bg-white rounded-[2rem] border border-slate-100 overflow-hidden card-hover group transition-all duration-300 hover:shadow-xl hover:border-cyan-200 cursor-pointer relative"> 
+            <div class="bg-gradient-to-br from-slate-800 to-slate-900 p-6 relative"> 
+                <div class="flex items-center justify-between mb-2"> 
+                    <span class="text-[10px] font-bold uppercase tracking-widest text-cyan-400">{{ $m->prodi->nama_prodi ?? '' }}</span> 
+                    <i class="fas fa-chalkboard-teacher text-cyan-500 opacity-50 group-hover:opacity-100 transition"></i> 
+                </div> 
+                <h3 class="font-bold text-white text-lg group-hover:text-cyan-400 transition">{{ $m->nama_makul }}</h3> 
             </div> 
-            <div class="p-5"> 
-                <p class="text-slate-500 text-sm mb-4 line-clamp-2">{{ $m->deskripsi }}</p> 
+            <div class="p-6"> 
+                <p class="text-slate-500 text-sm mb-6 line-clamp-2 leading-relaxed">{{ $m->deskripsi ?: 'Kuasai kompetensi mendalam melalui kurikulum terstruktur dan bimbingan ahli.' }}</p> 
                 <div class="flex items-center justify-between text-center"> 
-                    <div class="p-2 bg-gray-50 rounded-lg flex-1"><p class="font-bold text-sm">{{ $studentCount }}</p><p class="text-[10px] text-slate-400">Mahasiswa Aktif</p></div> 
+                    <div class="p-3 bg-gray-50 rounded-xl flex-1 border border-slate-100 group-hover:border-cyan-100 transition"><p class="font-bold text-sm text-slate-700">{{ $studentCount }}</p><p class="text-[10px] text-slate-400 font-bold uppercase tracking-wider mt-1">Mahasiswa Aktif</p></div> 
                 </div> 
             </div> 
         </a> 

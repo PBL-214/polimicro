@@ -16,10 +16,13 @@ Route::middleware('guest')->group(function () {
     Route::post('/register', [AuthController::class, 'register'])->middleware('throttle:3,1');
     Route::get('/forgot-password', [AuthController::class, 'showForgotPassword'])->name('forgot-password');
     Route::post('/forgot-password', [AuthController::class, 'forgotPassword'])->middleware('throttle:3,1');
+    Route::get('/reset-password/{token}', [AuthController::class, 'showResetForm'])->name('password.reset');
+    Route::post('/reset-password', [AuthController::class, 'resetPassword'])->name('password.update');
 });
 
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout')->middleware('auth');
 Route::get('/pending-verification', fn() => view('auth.pending-verification'))->name('pending-verification')->middleware('auth');
+Route::get('/search', [\App\Http\Controllers\SearchController::class, 'search'])->name('search')->middleware('auth');
 
 Route::get('/programs', [ProgramController::class, 'index'])->name('programs');
 Route::post('/programs/enroll', [ProgramController::class, 'enroll'])->name('programs.enroll')->middleware('auth');
@@ -30,6 +33,16 @@ Route::prefix('mahasiswa')->middleware(['auth', 'role:mahasiswa'])->name('mahasi
     Route::get('/dashboard', [\App\Http\Controllers\Mahasiswa\DashboardController::class, 'index'])->name('dashboard');
     Route::get('/courses', [\App\Http\Controllers\Mahasiswa\CourseController::class, 'index'])->name('courses');
     Route::get('/courses/{course}', [\App\Http\Controllers\Mahasiswa\CourseController::class, 'show'])->name('courses.show');
+    
+    // Forum Diskusi
+    Route::get('/courses/{course}/forum', [\App\Http\Controllers\Mahasiswa\ForumController::class, 'index'])->name('courses.forum.index');
+    Route::get('/courses/{course}/forum/{discussion}', [\App\Http\Controllers\Mahasiswa\ForumController::class, 'show'])->name('courses.forum.show');
+    Route::post('/courses/{course}/forum', [\App\Http\Controllers\Mahasiswa\ForumController::class, 'store'])->name('courses.forum.store');
+    Route::post('/courses/{course}/forum/{discussion}/reply', [\App\Http\Controllers\Mahasiswa\ForumController::class, 'reply'])->name('courses.forum.reply');
+
+    // Kehadiran/Absensi
+    Route::get('/courses/{course}/attendances', [\App\Http\Controllers\Mahasiswa\AttendanceController::class, 'index'])->name('courses.attendances.index');
+
     Route::get('/materials', [\App\Http\Controllers\Mahasiswa\MaterialController::class, 'index'])->name('materials');
     Route::get('/assignments', [\App\Http\Controllers\Mahasiswa\AssignmentController::class, 'index'])->name('assignments');
     Route::post('/assignments/submit', [\App\Http\Controllers\Mahasiswa\AssignmentController::class, 'submit'])->name('assignments.submit');
@@ -39,6 +52,7 @@ Route::prefix('mahasiswa')->middleware(['auth', 'role:mahasiswa'])->name('mahasi
     Route::get('/profile', [\App\Http\Controllers\Mahasiswa\ProfileController::class, 'index'])->name('profile');
     Route::put('/profile', [\App\Http\Controllers\Mahasiswa\ProfileController::class, 'update'])->name('profile.update');
     Route::put('/profile/password', [\App\Http\Controllers\Mahasiswa\ProfileController::class, 'changePassword'])->name('profile.password');
+    Route::post('/profile/avatar', [\App\Http\Controllers\Mahasiswa\ProfileController::class, 'uploadAvatar'])->name('profile.avatar');
 
     // Quizzes for Mahasiswa
     Route::get('/courses/{course}/quizzes/{quiz}/take', [\App\Http\Controllers\Mahasiswa\QuizController::class, 'take'])->name('courses.quizzes.take');
@@ -52,6 +66,25 @@ Route::prefix('dosen')->middleware(['auth', 'role:dosen'])->name('dosen.')->grou
     Route::get('/dashboard', [\App\Http\Controllers\Dosen\DashboardController::class, 'index'])->name('dashboard');
     Route::get('/courses', [\App\Http\Controllers\Dosen\CourseController::class, 'index'])->name('courses');
     Route::get('/courses/{course}', [\App\Http\Controllers\Dosen\CourseController::class, 'show'])->name('courses.show');
+    
+    // Forum Diskusi
+    Route::get('/courses/{course}/forum', [\App\Http\Controllers\Dosen\ForumController::class, 'index'])->name('courses.forum.index');
+    Route::get('/courses/{course}/forum/{discussion}', [\App\Http\Controllers\Dosen\ForumController::class, 'show'])->name('courses.forum.show');
+    Route::post('/courses/{course}/forum/{discussion}/reply', [\App\Http\Controllers\Dosen\ForumController::class, 'reply'])->name('courses.forum.reply');
+    Route::post('/courses/{course}/forum/{discussion}/pin', [\App\Http\Controllers\Dosen\ForumController::class, 'togglePin'])->name('courses.forum.pin');
+    Route::delete('/courses/{course}/forum/{discussion}', [\App\Http\Controllers\Dosen\ForumController::class, 'destroy'])->name('courses.forum.destroy');
+
+    // Kehadiran/Absensi
+    Route::get('/courses/{course}/attendances', [\App\Http\Controllers\Dosen\AttendanceController::class, 'index'])->name('courses.attendances.index');
+    Route::get('/courses/{course}/attendances/create', [\App\Http\Controllers\Dosen\AttendanceController::class, 'create'])->name('courses.attendances.create');
+    Route::post('/courses/{course}/attendances', [\App\Http\Controllers\Dosen\AttendanceController::class, 'store'])->name('courses.attendances.store');
+    Route::get('/courses/{course}/attendances/{attendance}', [\App\Http\Controllers\Dosen\AttendanceController::class, 'show'])->name('courses.attendances.show');
+    Route::put('/courses/{course}/attendances/{attendance}', [\App\Http\Controllers\Dosen\AttendanceController::class, 'update'])->name('courses.attendances.update');
+
+    // Pengumuman
+    Route::post('/courses/{course}/announcements', [\App\Http\Controllers\Dosen\AnnouncementController::class, 'store'])->name('courses.announcements.store');
+    Route::delete('/courses/{course}/announcements/{announcement}', [\App\Http\Controllers\Dosen\AnnouncementController::class, 'destroy'])->name('courses.announcements.destroy');
+
     Route::get('/materials', [\App\Http\Controllers\Dosen\MaterialController::class, 'index'])->name('materials');
     Route::post('/materials', [\App\Http\Controllers\Dosen\MaterialController::class, 'store'])->name('materials.store');
     Route::put('/materials/{materi}', [\App\Http\Controllers\Dosen\MaterialController::class, 'update'])->name('materials.update');
@@ -64,6 +97,12 @@ Route::prefix('dosen')->middleware(['auth', 'role:dosen'])->name('dosen.')->grou
     Route::put('/submissions/{submission}/grade', [\App\Http\Controllers\Dosen\SubmissionController::class, 'grade'])->name('submissions.grade');
     Route::get('/students', [\App\Http\Controllers\Dosen\StudentController::class, 'index'])->name('students');
     
+    // Profil Dosen
+    Route::get('/profile', [\App\Http\Controllers\Dosen\ProfileController::class, 'index'])->name('profile');
+    Route::put('/profile', [\App\Http\Controllers\Dosen\ProfileController::class, 'update'])->name('profile.update');
+    Route::put('/profile/password', [\App\Http\Controllers\Dosen\ProfileController::class, 'changePassword'])->name('profile.password');
+    Route::post('/profile/avatar', [\App\Http\Controllers\Dosen\ProfileController::class, 'uploadAvatar'])->name('profile.avatar');
+
     // Quizzes for Dosen
     Route::resource('quizzes', \App\Http\Controllers\Dosen\QuizController::class);
 });
@@ -96,6 +135,11 @@ Route::prefix('admin-akademik')->middleware(['auth', 'role:admin_akademik'])->na
     Route::get('/certificates', [\App\Http\Controllers\AdminAkademik\CertificateController::class, 'index'])->name('certificates');
     Route::post('/certificates', [\App\Http\Controllers\AdminAkademik\CertificateController::class, 'store'])->name('certificates.store');
     Route::delete('/certificates/{sertifikat}', [\App\Http\Controllers\AdminAkademik\CertificateController::class, 'destroy'])->name('certificates.destroy');
+    
+    // Laporan
+    Route::get('/reports', [\App\Http\Controllers\AdminAkademik\ReportController::class, 'index'])->name('reports');
+    Route::get('/reports/courses/{course}', [\App\Http\Controllers\AdminAkademik\ReportController::class, 'courseReport'])->name('reports.course');
+    Route::get('/reports/courses/{course}/export', [\App\Http\Controllers\AdminAkademik\ReportController::class, 'exportCsv'])->name('reports.export');
 });
 
 // Notifications

@@ -28,7 +28,7 @@ class GeneralNotification extends Notification
      */
     public function via(object $notifiable): array
     {
-        return ['database'];
+        return ['database', 'mail'];
     }
 
     /**
@@ -39,5 +39,22 @@ class GeneralNotification extends Notification
     public function toArray(object $notifiable): array
     {
         return $this->data;
+    }
+
+    /**
+     * Get the mail representation of the notification.
+     */
+    public function toMail(object $notifiable): MailMessage
+    {
+        $message = (new MailMessage)
+            ->subject($this->data['title'] ?? 'Notifikasi Polimicro')
+            ->greeting('Halo, ' . $notifiable->name . '!')
+            ->line($this->data['message'] ?? 'Anda memiliki notifikasi baru.');
+
+        if (isset($this->data['url'])) {
+            $message->action('Lihat Detail', $this->data['url']);
+        }
+
+        return $message->salutation('Salam, Tim Polimicro');
     }
 }

@@ -111,8 +111,21 @@
         </div>
     </div>
 
+    {{-- Action Tabs --}}
+    <div class="flex flex-wrap gap-3 mb-8">
+        <a href="#materi-kegiatan" class="px-5 py-2.5 bg-cyan-600 hover:bg-cyan-700 text-white rounded-xl text-sm font-bold shadow-md shadow-cyan-600/20 transition flex items-center gap-2">
+            <i class="fas fa-list-ul"></i> Materi & Kegiatan
+        </a>
+        <a href="{{ route('mahasiswa.courses.forum.index', $course->id) }}" class="px-5 py-2.5 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 rounded-xl text-sm font-bold transition flex items-center gap-2">
+            <i class="fas fa-comments text-cyan-500"></i> Forum Diskusi
+        </a>
+        <a href="{{ route('mahasiswa.courses.attendances.index', $course->id) }}" class="px-5 py-2.5 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 rounded-xl text-sm font-bold transition flex items-center gap-2">
+            <i class="fas fa-calendar-check text-emerald-500"></i> Kehadiran
+        </a>
+    </div>
+
     {{-- Course Contents --}}
-    <h2 class="text-xl font-bold text-gray-900 mb-6 font-serif flex items-center gap-2"><i class="fas fa-list-ul text-cyan-600"></i> Materi & Kegiatan Pembelajaran</h2>
+    <h2 id="materi-kegiatan" class="text-xl font-bold text-gray-900 mb-6 font-serif flex items-center gap-2 scroll-mt-28"><i class="fas fa-list-ul text-cyan-600"></i> Materi & Kegiatan Pembelajaran</h2>
     
     <div class="space-y-6">
         @forelse($materials as $index => $mat)

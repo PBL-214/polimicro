@@ -7,6 +7,11 @@
     <meta http-equiv="X-Content-Type-Options" content="nosniff">
     <title>@yield('title', 'Polimicro')</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+        }
+    </script>
     <link rel="stylesheet" href="{{ asset('design-assets/css/custom.css') }}">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400..700;1,400..700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
@@ -32,9 +37,64 @@
         @media screen and (max-width: 768px) {
             input, select, textarea { font-size: 16px !important; }
         }
+
+        /* Dark Mode Transition Elements */
+        body, nav, div, p, span, h1, h2, h3, h4, h5, h6, a, button, input, textarea, select {
+            transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease;
+        }
+
+        /* Dark Mode Switch Animation */
+        #dark-mode-icon {
+            transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s ease;
+        }
+        .rotate-in {
+            transform: rotate(360deg) scale(1.2);
+            opacity: 0;
+        }
+
+        /* Auto Dark Mode Overrides (Global) */
+        .dark .bg-white { background-color: #1e293b !important; border-color: #334155 !important; }
+        .dark .text-gray-900, .dark .text-slate-900, .dark .text-slate-800 { color: #f8fafc !important; }
+        .dark .text-gray-700, .dark .text-slate-700, .dark .text-gray-600, .dark .text-slate-600 { color: #cbd5e1 !important; }
+        .dark .text-gray-500, .dark .text-slate-500, .dark .text-slate-400 { color: #94a3b8 !important; }
+        .dark .bg-slate-50, .dark .bg-gray-50 { background-color: #0f172a !important; border-color: #334155 !important; }
+        .dark .bg-slate-50\/50, .dark .bg-gray-50\/50 { background-color: rgba(15, 23, 42, 0.5) !important; }
+        .dark .bg-cyan-50, .dark .bg-blue-50, .dark .bg-emerald-50, .dark .bg-yellow-50, .dark .bg-red-50, .dark .bg-amber-50, .dark .bg-purple-50 { background-color: rgba(15, 23, 42, 0.8) !important; border-color: #334155 !important; }
+        .dark .bg-cyan-100, .dark .bg-blue-100 { background-color: #1e293b !important; }
+        .dark .bg-cyan-50\/20 { background-color: rgba(8, 145, 178, 0.05) !important; }
+        .dark .bg-cyan-50\/50 { background-color: rgba(8, 145, 178, 0.1) !important; }
+        .dark .border-cyan-100, .dark .border-blue-100, .dark .border-emerald-100, .dark .border-yellow-100, .dark .border-red-100, .dark .border-amber-100, .dark .border-purple-100 { border-color: #334155 !important; }
+        .dark .border-gray-100, .dark .border-slate-100, .dark .border-slate-200, .dark .border-gray-200, .dark .border-gray-50, .dark .border-b, .dark .border-t { border-color: #334155 !important; }
+        .dark .bg-slate-100, .dark .bg-gray-100 { background-color: #334155 !important; }
+        .dark .divide-gray-50 > :not([hidden]) ~ :not([hidden]), .dark .divide-slate-50 > :not([hidden]) ~ :not([hidden]), .dark .divide-gray-100 > :not([hidden]) ~ :not([hidden]), .dark .divide-slate-100 > :not([hidden]) ~ :not([hidden]) { border-color: #334155 !important; }
+        
+        /* Form Inputs */
+        .dark input[type="text"], .dark input[type="email"], .dark input[type="password"], .dark input[type="number"], .dark input[type="date"], .dark input[type="datetime-local"], .dark input[type="time"], .dark textarea, .dark select { background-color: #0f172a !important; border-color: #334155 !important; color: #f8fafc !important; }
+        .dark input::placeholder, .dark textarea::placeholder { color: #64748b !important; }
+        .dark input[type="file"]::file-selector-button { background-color: #334155 !important; color: #f8fafc !important; border-color: #475569 !important; }
+        .dark input[type="file"]:hover::file-selector-button { background-color: #475569 !important; }
+        
+        /* FullCalendar Enhancements */
+        .dark .fc-theme-standard td, .dark .fc-theme-standard th { border-color: #334155 !important; }
+        .dark .fc-header-toolbar { border-bottom-color: #334155 !important; }
+        .dark .fc-day-today { background-color: #334155 !important; }
+        .dark .fc-daygrid-day-number, .dark .fc-col-header-cell-cushion { color: #cbd5e1 !important; }
+        .dark .fc .fc-button-primary { background-color: #334155 !important; border-color: #475569 !important; color: #f8fafc !important; }
+        .dark .fc .fc-button-primary:hover { background-color: #475569 !important; }
+        .dark .fc .fc-button-primary:not(:disabled):active, .dark .fc .fc-button-primary:not(:disabled).fc-button-active { background-color: #1e293b !important; border-color: #0ea5e9 !important; }
+        .dark .fc-toolbar-title { color: #f8fafc !important; }
+        
+        /* Table Enhancements */
+        .dark table th { background-color: #0f172a !important; color: #94a3b8 !important; border-bottom-color: #334155 !important; }
+        .dark table td { border-bottom-color: #334155 !important; color: #cbd5e1 !important; }
+        .dark table tbody tr:hover { background-color: #334155 !important; }
+        .dark table tbody tr.bg-gray-50, .dark table tbody tr.bg-slate-50 { background-color: #0f172a !important; }
+        
+        /* Modals and Dropdowns in dark mode */
+        .dark #search-results, .dark .absolute.bg-white { background-color: #1e293b !important; border-color: #334155 !important; }
     </style>
 </head>
-<body class="bg-slate-50 text-slate-700">
+<body class="bg-slate-50 dark:bg-slate-900 text-slate-700 dark:text-slate-300">
     <div id="top-progress"></div>
     @php
         $user = auth()->user();
@@ -53,9 +113,6 @@
                 'RESULTS' => [
                     ['label' => 'Nilai', 'icon' => 'fas fa-chart-bar', 'route' => 'mahasiswa.grades', 'id' => 'grades'],
                     ['label' => 'Sertifikat', 'icon' => 'fas fa-certificate', 'route' => 'mahasiswa.certificates', 'id' => 'certificates'],
-                ],
-                'ACCOUNT' => [
-                    ['label' => 'Profil', 'icon' => 'fas fa-user-cog', 'route' => 'mahasiswa.profile', 'id' => 'profile'],
                 ]
             ],
             'dosen' => [
@@ -92,6 +149,7 @@
                 ],
                 'RECORDS' => [
                     ['label' => 'Sertifikat', 'icon' => 'fas fa-certificate', 'route' => 'admin-akademik.certificates', 'id' => 'certificates'],
+                    ['label' => 'Laporan', 'icon' => 'fas fa-chart-line', 'route' => 'admin-akademik.reports', 'id' => 'reports'],
                 ]
             ],
         ];
@@ -114,7 +172,7 @@
                 <div class="hidden xl:flex flex-1 justify-center items-center gap-2">
                     @foreach($itemsByGroup as $group => $items)
                         @foreach($items as $item)
-                            <a href="{{ route($item['route']) }}" onclick="startProgress()" class="px-4 py-2 rounded-full text-sm font-semibold transition-all {{ $activePage === $item['id'] ? 'bg-cyan-500 text-white shadow-md shadow-cyan-500/20' : 'text-slate-300 hover:text-white hover:bg-slate-700' }}">
+                            <a href="{{ route($item['route']) }}" onclick="startProgress()" class="px-4 py-2 rounded-full text-sm font-semibold whitespace-nowrap transition-all {{ $activePage === $item['id'] ? 'bg-cyan-500 text-white shadow-md shadow-cyan-500/20' : 'text-slate-300 hover:text-white hover:bg-slate-700' }}">
                                 {{ $item['label'] }}
                             </a>
                         @endforeach
@@ -124,6 +182,19 @@
                 {{-- User & Notifications --}}
                 <div class="flex items-center gap-4">
                     
+                    {{-- Global Search --}}
+                    <div class="relative hidden md:block">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <i class="fas fa-search text-slate-400 text-sm"></i>
+                        </div>
+                        <input type="text" id="global-search" placeholder="Cari sesuatu..." class="bg-slate-700 text-sm text-white rounded-full pl-9 pr-4 py-1.5 focus:outline-none focus:ring-2 focus:ring-cyan-500 placeholder-slate-400 w-48 transition-all duration-300 focus:w-64">
+                        <div id="search-results" class="absolute top-full mt-2 w-full bg-white rounded-xl shadow-xl overflow-hidden hidden flex-col border border-slate-100 z-50"></div>
+                    </div>
+
+                    {{-- Dark Mode Toggle --}}
+                    <button id="dark-mode-toggle" class="text-slate-300 hover:text-white transition p-2 focus:outline-none">
+                        <i class="fas fa-moon text-lg" id="dark-mode-icon"></i>
+                    </button>
 
                     {{-- Notification Center --}}
                     <div class="relative group">
@@ -167,11 +238,14 @@
                     
                     {{-- Profile Menu Desktop --}}
                     <div class="hidden lg:flex items-center gap-3 border-l border-slate-700 pl-4">
-                        <div class="text-right">
-                            <p class="text-sm font-bold leading-tight">{{ $user->name }}</p>
-                            <p class="text-[10px] text-cyan-400 font-bold uppercase tracking-widest">{{ $user->getRoleLabel() }}</p>
-                        </div>
-                        <div class="w-9 h-9 rounded-full flex items-center justify-center text-white text-sm font-bold shadow-lg shadow-cyan-500/20" style="background:linear-gradient(135deg,#0ea5e9,#06b6d4)">{{ $initials }}</div>
+
+                        <a href="{{ Route::has($role . '.profile') ? route($role . '.profile') : '#' }}" class="w-9 h-9 rounded-full overflow-hidden flex items-center justify-center text-white text-sm font-bold shadow-lg shadow-cyan-500/20 hover:scale-110 transition cursor-pointer" style="background:linear-gradient(135deg,#0ea5e9,#06b6d4)" title="Lihat Profil">
+                            @if($user->avatar)
+                                <img src="{{ $user->getAvatarUrl() }}" class="w-full h-full object-cover">
+                            @else
+                                {{ $initials }}
+                            @endif
+                        </a>
                         <form method="POST" action="{{ route('logout') }}" class="ml-2">
                             @csrf
                             <button type="submit" class="text-slate-400 hover:text-red-400 transition" title="Keluar"><i class="fas fa-sign-out-alt"></i></button>
@@ -191,13 +265,16 @@
         {{-- Mobile Navigation Menu --}}
         <div id="mobile-menu" class="lg:hidden hidden bg-slate-900 border-t border-slate-700">
             <div class="px-4 py-4 space-y-1 overflow-y-auto max-h-[80vh]">
-                <div class="flex items-center gap-3 mb-6 p-3 bg-slate-800 rounded-xl">
-                    <div class="w-10 h-10 rounded-full flex items-center justify-center text-white text-sm font-bold bg-cyan-600">{{ $initials }}</div>
-                    <div>
-                        <p class="font-bold text-sm text-white">{{ $user->name }}</p>
-                        <p class="text-[10px] text-cyan-400 font-bold uppercase tracking-widest">{{ $user->getRoleLabel() }}</p>
+                <a href="{{ Route::has($role . '.profile') ? route($role . '.profile') : '#' }}" class="flex items-center gap-3 mb-6 p-3 bg-slate-800 rounded-xl hover:bg-slate-700 transition cursor-pointer">
+                    <div class="w-10 h-10 rounded-full overflow-hidden flex items-center justify-center text-white text-sm font-bold bg-cyan-600 shadow-lg">
+                        @if($user->avatar)
+                            <img src="{{ $user->getAvatarUrl() }}" class="w-full h-full object-cover">
+                        @else
+                            {{ $initials }}
+                        @endif
                     </div>
-                </div>
+
+                </a>
 
                 @foreach($itemsByGroup as $group => $items)
                     <div class="px-3 py-2 text-[10px] font-bold text-slate-500 uppercase tracking-widest mt-2">{{ $group }}</div>
@@ -285,43 +362,127 @@
             }
         });
 
-        function startProgress() {
-            const bar = document.getElementById('top-progress');
-            bar.style.width = '0%';
-            bar.style.opacity = '1';
+        // Dark Mode Logic
+        const darkModeToggle = document.getElementById('dark-mode-toggle');
+        const darkModeIcon = document.getElementById('dark-mode-icon');
+        const html = document.documentElement;
+        
+        function updateDarkModeIcon() {
+            darkModeIcon.classList.add('rotate-in');
             
-            let w = 0;
-            const interval = setInterval(() => {
-                if (w < 90) {
-                    w += Math.random() * 5;
-                    bar.style.width = w + '%';
+            setTimeout(() => {
+                if (html.classList.contains('dark')) {
+                    darkModeIcon.classList.remove('fa-moon');
+                    darkModeIcon.classList.add('fa-sun');
+                } else {
+                    darkModeIcon.classList.remove('fa-sun');
+                    darkModeIcon.classList.add('fa-moon');
                 }
-            }, 200);
+                darkModeIcon.classList.remove('rotate-in');
+            }, 150); // wait halfway to swap icon
+        }
 
-            window.addEventListener('load', () => {
-                clearInterval(interval);
-                bar.style.width = '100%';
-                setTimeout(() => {
-                    bar.style.opacity = '0';
-                    setTimeout(() => bar.style.width = '0%', 400);
-                }, 500);
+        if (localStorage.getItem('theme') === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            html.classList.add('dark');
+            darkModeIcon.classList.add('fa-sun');
+        } else {
+            html.classList.remove('dark');
+            darkModeIcon.classList.add('fa-moon');
+        }
+
+        if (darkModeToggle) {
+            darkModeToggle.addEventListener('click', () => {
+                html.classList.toggle('dark');
+                if (html.classList.contains('dark')) {
+                    localStorage.setItem('theme', 'dark');
+                } else {
+                    localStorage.setItem('theme', 'light');
+                }
+                updateDarkModeIcon();
             });
         }
 
-        window.addEventListener('pageshow', (event) => {
-            const bar = document.getElementById('top-progress');
-            bar.style.opacity = '0';
-            bar.style.width = '0%';
-        });
+        // Global Search Logic
+        const searchInput = document.getElementById('global-search');
+        const searchResults = document.getElementById('search-results');
+        
+        if (searchInput && searchResults) {
+            let searchTimeout;
+            
+            searchInput.addEventListener('input', function() {
+                clearTimeout(searchTimeout);
+                const query = this.value.trim();
+                
+                if (query.length < 2) {
+                    searchResults.classList.add('hidden');
+                    return;
+                }
+                
+                searchTimeout = setTimeout(() => {
+                    fetch(`{{ route('search') }}?q=${encodeURIComponent(query)}`)
+                        .then(res => res.json())
+                        .then(data => {
+                            searchResults.innerHTML = '';
+                            if (data.results.length === 0) {
+                                searchResults.innerHTML = '<div class="p-3 text-sm text-gray-500 text-center dark:bg-slate-800 dark:text-gray-400">Tidak ada hasil</div>';
+                            } else {
+                                data.results.forEach(item => {
+                                    searchResults.innerHTML += `
+                                        <a href="${item.url}" class="p-3 flex items-center gap-3 hover:bg-slate-50 dark:hover:bg-slate-700 transition border-b border-gray-100 dark:border-slate-700 last:border-0 dark:bg-slate-800">
+                                            <div class="w-8 h-8 rounded-full bg-cyan-50 dark:bg-cyan-900/30 flex items-center justify-center text-cyan-600 dark:text-cyan-400 shrink-0">
+                                                <i class="${item.icon} text-xs"></i>
+                                            </div>
+                                            <div>
+                                                <p class="text-xs font-bold text-slate-800 dark:text-white">${item.title}</p>
+                                                <p class="text-[10px] text-gray-500 dark:text-gray-400">${item.type}</p>
+                                            </div>
+                                        </a>
+                                    `;
+                                });
+                            }
+                            searchResults.classList.remove('hidden');
+                            searchResults.classList.add('flex');
+                        });
+                }, 300);
+            });
+            
+            document.addEventListener('click', function(e) {
+                if (!searchInput.contains(e.target) && !searchResults.contains(e.target)) {
+                    searchResults.classList.add('hidden');
+                    searchResults.classList.remove('flex');
+                }
+            });
+        }
 
+        // Mobile menu toggle logic
         function toggleMobileMenu() {
             const menu = document.getElementById('mobile-menu');
-            if (menu.classList.contains('hidden')) {
-                menu.classList.remove('hidden');
-            } else {
-                menu.classList.add('hidden');
-            }
+            menu.classList.toggle('hidden');
         }
+
+        // Progress bar logic
+        function startProgress() {
+            const bar = document.getElementById('top-progress');
+            bar.style.width = '30%';
+            bar.style.opacity = '1';
+            setTimeout(() => { bar.style.width = '70%'; }, 200);
+        }
+        window.addEventListener('load', () => {
+            const bar = document.getElementById('top-progress');
+            if (bar) {
+                bar.style.width = '100%';
+                setTimeout(() => { bar.style.opacity = '0'; }, 300);
+                setTimeout(() => { bar.style.width = '0'; }, 700);
+            }
+        });
+
+        window.addEventListener('pageshow', (event) => {
+            const bar = document.getElementById('top-progress');
+            if (bar) {
+                bar.style.opacity = '0';
+                bar.style.width = '0%';
+            }
+        });
     </script>
 </body>
 </html>

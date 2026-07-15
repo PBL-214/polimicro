@@ -43,8 +43,46 @@
         </div>
     </div>
 
+    {{-- Action Tabs --}}
+    <div class="flex flex-wrap gap-3 mb-8">
+        <a href="#materi-kegiatan" class="px-5 py-2.5 bg-cyan-600 hover:bg-cyan-700 text-white rounded-xl text-sm font-bold shadow-md shadow-cyan-600/20 transition flex items-center gap-2">
+            <i class="fas fa-folder-open"></i> Materi & Tugas
+        </a>
+        <a href="{{ route('dosen.courses.forum.index', $course->id) }}" class="px-5 py-2.5 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 rounded-xl text-sm font-bold transition flex items-center gap-2">
+            <i class="fas fa-comments text-cyan-500"></i> Forum Diskusi
+        </a>
+        <a href="{{ route('dosen.courses.attendances.index', $course->id) }}" class="px-5 py-2.5 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 rounded-xl text-sm font-bold transition flex items-center gap-2">
+            <i class="fas fa-calendar-check text-emerald-500"></i> Kehadiran
+        </a>
+        <button onclick="openPengumumanModal()" class="px-5 py-2.5 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 rounded-xl text-sm font-bold transition flex items-center gap-2">
+            <i class="fas fa-bullhorn text-amber-500"></i> Buat Pengumuman
+        </button>
+    </div>
+
+    {{-- Announcements Section --}}
+    @if($course->announcements->count() > 0)
+        <div class="mb-8">
+            <h2 class="text-xl font-bold text-gray-900 dark:text-white mb-4 font-serif flex items-center gap-2"><i class="fas fa-bullhorn text-amber-500"></i> Pengumuman Kelas</h2>
+            <div class="space-y-4">
+                @foreach($course->announcements as $announcement)
+                    <div class="bg-amber-50 dark:bg-amber-900/10 border border-amber-200 dark:border-amber-800/50 rounded-2xl p-5 relative">
+                        <div class="absolute top-4 right-4 flex gap-2">
+                            <form action="{{ route('dosen.courses.announcements.destroy', [$course->id, $announcement->id]) }}" method="POST" onsubmit="return confirm('Hapus pengumuman ini?');">
+                                @csrf @method('DELETE')
+                                <button type="submit" class="text-red-400 hover:text-red-600 transition"><i class="fas fa-trash"></i></button>
+                            </form>
+                        </div>
+                        <h4 class="font-bold text-amber-900 dark:text-amber-400 text-sm mb-1">{{ $announcement->title }}</h4>
+                        <p class="text-xs text-amber-700/70 dark:text-amber-500/70 mb-3"><i class="far fa-clock mr-1"></i>{{ $announcement->created_at->format('d M Y, H:i') }}</p>
+                        <p class="text-sm text-amber-800 dark:text-amber-200 whitespace-pre-wrap">{{ $announcement->body }}</p>
+                    </div>
+                @endforeach
+            </div>
+        </div>
+    @endif
+
     {{-- Materials and Assignments List --}}
-    <h2 class="text-xl font-bold text-gray-900 mb-6 font-serif flex items-center gap-2"><i class="fas fa-folder-open text-cyan-600"></i> Struktur Materi & Tugas Kelas</h2>
+    <h2 id="materi-kegiatan" class="text-xl font-bold text-gray-900 mb-6 font-serif flex items-center gap-2 scroll-mt-28"><i class="fas fa-folder-open text-cyan-600"></i> Struktur Materi & Tugas Kelas</h2>
     
     <div class="space-y-6">
         @forelse($materials as $index => $mat)
@@ -323,10 +361,40 @@
         </form>
     </div>
 </div>
+
+{{-- Announcement Modal --}}
+<div id="pengumuman-modal" class="fixed inset-0 z-50 hidden items-center justify-center shadow-2xl" style="background:rgba(15,23,42,0.6); backdrop-filter: blur(4px);">
+    <div class="bg-white rounded-3xl p-8 max-w-lg w-full mx-4 fade-in">
+        <div class="flex items-center justify-between mb-6">
+            <h3 class="text-xl font-bold font-serif text-slate-800">Buat Pengumuman</h3>
+            <button type="button" onclick="closePengumumanModal()" class="w-8 h-8 rounded-full bg-gray-100 hover:bg-gray-200 flex items-center justify-center text-gray-400 hover:text-gray-600 transition"><i class="fas fa-times text-sm"></i></button>
+        </div>
+        <form method="POST" action="{{ route('dosen.courses.announcements.store', $course->id) }}" class="space-y-4" onsubmit="this.querySelector('[data-submit]').disabled=true;this.querySelector('[data-submit]').innerHTML='<i class=\'fas fa-spinner fa-spin text-sm\'></i> Mengirim...'">
+            @csrf
+            <div><label class="block text-sm font-medium text-slate-600 mb-1">Judul <span class="text-red-400">*</span></label><input type="text" name="title" required class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 transition"></div>
+            <div><label class="block text-sm font-medium text-slate-600 mb-1">Isi Pengumuman <span class="text-red-400">*</span></label><textarea name="body" rows="4" required class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 transition"></textarea></div>
+            
+            <div class="flex gap-3 pt-2">
+                <button type="button" onclick="closePengumumanModal()" class="flex-1 py-3 rounded-xl border border-slate-200 text-slate-600 font-medium hover:bg-slate-50 transition">Batal</button>
+                <button type="submit" data-submit class="flex-1 py-3 bg-amber-500 text-white rounded-xl font-semibold hover:bg-amber-600 transition flex items-center justify-center gap-2"><i class="fas fa-paper-plane text-sm"></i> Kirim ke Semua Mahasiswa</button>
+            </div>
+        </form>
+    </div>
+</div>
 @endpush
 
 @push('scripts')
 <script>
+// --- Pengumuman Modals JS ---
+function openPengumumanModal() {
+    document.getElementById('pengumuman-modal').classList.remove('hidden'); 
+    document.getElementById('pengumuman-modal').classList.add('flex'); 
+}
+function closePengumumanModal() { 
+    document.getElementById('pengumuman-modal').classList.add('hidden'); 
+    document.getElementById('pengumuman-modal').classList.remove('flex'); 
+}
+
 // --- Materi Modals JS ---
 function openMateriModal() {
     document.getElementById('m-modal-title').innerText = 'Tambah Materi';
@@ -386,10 +454,12 @@ function closeTugasModal() {
 // Close modals when clicking backdrop
 document.getElementById('materi-modal').addEventListener('click', function(e) { if (e.target === this) closeMateriModal(); });
 document.getElementById('tugas-modal').addEventListener('click', function(e) { if (e.target === this) closeTugasModal(); });
+document.getElementById('pengumuman-modal').addEventListener('click', function(e) { if (e.target === this) closePengumumanModal(); });
 document.addEventListener('keydown', function(e) { 
     if (e.key === 'Escape') {
         closeMateriModal();
         closeTugasModal();
+        closePengumumanModal();
     }
 });
 </script>

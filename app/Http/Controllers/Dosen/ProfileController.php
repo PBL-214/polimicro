@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Mahasiswa;
+namespace App\Http\Controllers\Dosen;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
@@ -12,23 +12,20 @@ class ProfileController extends Controller
     public function index()
     {
         $user = Auth::user();
-        return view('mahasiswa.profile', compact('user'));
+        return view('dosen.profile', compact('user'));
     }
 
     public function update(Request $request)
     {
+        $user = Auth::user();
         $request->validate([
-            'nama' => 'required|string|max:100',
+            'name' => 'required|string|max:100',
+            'email' => 'required|email|unique:users,email,' . $user->id,
             'phone' => 'nullable|string|max:20',
-            'address' => 'nullable|string',
+            'address' => 'nullable|string|max:500',
         ]);
 
-        $user = Auth::user();
-        $user->update([
-            'name' => $request->nama,
-            'phone' => $request->phone,
-            'address' => $request->address,
-        ]);
+        $user->update($request->only('name', 'email', 'phone', 'address'));
 
         return back()->with('success', 'Profil berhasil diperbarui!');
     }
@@ -36,16 +33,16 @@ class ProfileController extends Controller
     public function changePassword(Request $request)
     {
         $request->validate([
-            'old_password' => 'required',
-            'new_password' => 'required|min:6|confirmed',
+            'current_password' => 'required',
+            'password' => 'required|min:6|confirmed',
         ]);
 
         $user = Auth::user();
-        if (!Hash::check($request->old_password, $user->password)) {
-            return back()->withErrors(['old_password' => 'Password lama salah!']);
+        if (!Hash::check($request->current_password, $user->password)) {
+            return back()->withErrors(['current_password' => 'Password lama salah!']);
         }
 
-        $user->update(['password' => Hash::make($request->new_password)]);
+        $user->update(['password' => Hash::make($request->password)]);
 
         return back()->with('success', 'Password berhasil diperbarui!');
     }

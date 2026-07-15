@@ -82,10 +82,45 @@ class AuthController extends Controller
 
         $user = User::where('email', $request->email)->first();
         if ($user) {
+            $token = \Illuminate\Support\Str::random(64);
+            \Illuminate\Support\Facades\DB::table('password_reset_tokens')->updateOrInsert(
+                ['email' => $user->email],
+                ['token' => Hash::make($token), 'created_at' => now()]
+            );
+
+            $user->notify(new \App\Notifications\ResetPasswordNotification($token));
             return back()->with('success', 'Link reset password telah dikirim ke email Anda.');
         }
 
         return back()->withErrors(['email' => 'Email tidak ditemukan!']);
+    }
+
+    public function showResetForm($token, Request $request)
+    {
+        return view('auth.reset-password', ['token' => $token, 'email' => $request->query('email')]);
+    }
+
+    public function resetPassword(Request $request)
+    {
+        $request->validate([
+            'email' => 'required|email',
+            'token' => 'required',
+            'password' => 'required|min:6|confirmed',
+        ]);
+
+        $reset = \Illuminate\Support\Facades\DB::table('password_reset_tokens')
+            ->where('email', $request->email)->first();
+
+        if (!$reset || !Hash::check($request->token, $reset->token)) {
+            return back()->withErrors(['email' => 'Token tidak valid atau sudah kedaluwarsa.']);
+        }
+
+        $user = User::where('email', $request->email)->first();
+        $user->update(['password' => Hash::make($request->password)]);
+
+        \Illuminate\Support\Facades\DB::table('password_reset_tokens')->where('email', $request->email)->delete();
+
+        return redirect()->route('login')->with('success', 'Password berhasil direset! Silakan login dengan password baru.');
     }
 
     public function logout(Request $request)

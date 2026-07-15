@@ -33,4 +33,24 @@ class Makul extends Model
     {
         return $this->hasMany(Tugas::class, 'makul_id');
     }
+
+    public function quizzes(): HasMany
+    {
+        return $this->hasMany(Quiz::class, 'makul_id');
+    }
+
+    public function discussions(): HasMany
+    {
+        return $this->hasMany(ForumDiscussion::class, 'makul_id');
+    }
+
+    public function announcements(): HasMany
+    {
+        return $this->hasMany(Announcement::class, 'makul_id');
+    }
+
+    public function attendances(): HasMany
+    {
+        return $this->hasMany(Attendance::class, 'makul_id');
+    }
 }
